@@ -67,8 +67,16 @@ export const webServerEnvSchema = z.object({
   API_INTERNAL_URL: z.url().default('http://localhost:4000'),
 });
 
+export const appEnvSchema = z.enum(['development', 'preview', 'production']).default('development');
+export type AppEnv = z.infer<typeof appEnvSchema>;
+
 export const webPublicEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url().default('http://localhost:3000'),
+  /**
+   * Deployment stage (independent of NODE_ENV, which is "production" for every optimised
+   * build). Anything other than "production" shows the synthetic-data warning banner.
+   */
+  NEXT_PUBLIC_APP_ENV: appEnvSchema,
 });
 
 export type ApiEnv = z.infer<typeof apiEnvSchema>;

@@ -19,8 +19,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  output: 'standalone',
-  outputFileTracingRoot: resolve(import.meta.dirname, '../..'),
   // Same-origin API access keeps the session cookie first-party (ADR-006).
   rewrites() {
     return Promise.resolve([

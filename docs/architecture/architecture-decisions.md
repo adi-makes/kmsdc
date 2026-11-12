@@ -146,3 +146,17 @@ and the same for `chairId` (when it is not null). The service also pre-checks av
 **Status:** Accepted · 2026-11-12
 **Decision:** Shared packages (`config`, `types`, `validation`, `api-client`, `ui`) are ESM, compiled with `tsc` to `dist/`, and consumed through `exports`. The CommonJS NestJS API loads them via Node's native `require(esm)` (Node ≥ 22.12). Turborepo builds dependencies first (`dependsOn: ["^build"]`).
 **Consequences:** One build step per package, but every runtime (Nest, the worker, Next.js and Vitest) consumes plain JavaScript with no special transpilation config.
+
+## ADR-022 Component library: owned shadcn-pattern components on Radix
+
+**Status:** Accepted · 2026-11-12
+**Context:** The spec calls for shadcn/ui customised to the clinic's design system. The shadcn CLI copies generic components into an app.
+**Decision:** Components live in `packages/ui` and follow the shadcn/ui pattern (Radix UI primitives via the unified `radix-ui` package, `class-variance-authority` variants, `tailwind-merge`). They are written against Kottakal semantic tokens, with the accessibility contracts (labels, focus return, status semantics) built in. Tailwind's default palette is reset so only tokens exist. Fonts are Figtree + Noto Sans, self-hosted with `next/font`. Modules that must accept icon components from Server Components stay free of `'use client'` (`states.tsx`, `badge.tsx`, `navigation.tsx`, `public.tsx`).
+**Consequences:** No CLI regeneration. Upgrades are deliberate. Rebranding is a token change, gated by `pnpm check:contrast` in CI.
+
+## ADR-023 pnpm virtual-store name length
+
+**Status:** Accepted · 2026-11-12
+**Context:** On the NTFS3 development volume, Turbopack failed to resolve `next` (and hung in its PostCSS worker) once pnpm's `.pnpm/<name>` directory names grew past about 118 characters (e.g. when `@playwright/test` became a peer of `next`).
+**Decision:** `virtualStoreDirMaxLength: 60` in `pnpm-workspace.yaml` (pnpm hashes longer names). Changing it requires a modules purge (`CI=true pnpm install`).
+**Consequences:** Shorter, hashed paths in `node_modules/.pnpm`. No functional difference elsewhere.

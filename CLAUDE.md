@@ -17,10 +17,11 @@ marketing and analytics. Built phase by phase from the authoritative spec:
 | ----------------------- | --------------------------------------------------------- |
 | 0 Inspection & planning | ✅ Complete (2026-11-12)                                  |
 | 1 Monorepo & local env  | ✅ Complete (2026-11-12)                                  |
-| 2 Design system         | ⏭ Next                                                    |
-| 3–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
+| 2 Design system         | ✅ Complete (2026-11-12)                                  |
+| 3 Public website        | ⏭ Next                                                    |
+| 4–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
 
-Foundation only: health endpoints, env validation, worker heartbeat. No business features yet. Feature status lives in [docs/product/feature-matrix.md](docs/product/feature-matrix.md).
+Foundation + design system (`@kmsdc/ui`, showcase at `/app/design-system`). No business features yet. Feature status lives in [docs/product/feature-matrix.md](docs/product/feature-matrix.md).
 
 ## Locked architecture (change only with a written ADR + owner approval)
 
@@ -84,6 +85,13 @@ MinIO 9010/9011 · Mailpit 1035/8035.
 - Domain events are written to `OutboxEvent` in the same transaction as the change ([event-flow](docs/architecture/event-flow.md)).
 - Logging: pino JSON with PII redaction. Job payloads carry IDs only.
 - Raw-SQL DB objects (exclusion constraints, trigram indexes, REVOKEs) live in migrations and are asserted by tests.
+
+## UI rules
+
+- Use `@kmsdc/ui` components and semantic tokens only (no raw hex, no Tailwind default palette, which is reset). See [design-system](docs/design/design-system.md).
+- Components that receive icon components from Server Components must not be in `'use client'` files.
+- New pages are added to `apps/web/e2e/pages.ts` so they get axe, overflow and screenshot coverage.
+- Brand colours are PROVISIONAL. Change only the `BRAND` primitives, then run `pnpm check:contrast`.
 
 ## Testing rules
 

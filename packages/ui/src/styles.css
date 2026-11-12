@@ -1,1 +1,267 @@
-/* Design tokens are defined in Phase 2. */
+/*
+ * Kottakal design tokens (Tailwind CSS v4).
+ *
+ * Three layers (docs/design/design-system.md):
+ *   1. Primitives  — raw palette. The BRAND block is PROVISIONAL until the clinic supplies
+ *                    its branding; swapping brand colours means editing only that block.
+ *   2. Semantic    — what components use (bg-surface, text-fg-muted, bg-primary…).
+ *   3. Component   — a few component-level values (radius, focus ring, control height).
+ *
+ * Components must never use raw hex or primitive palette classes for meaning; they use
+ * semantic tokens so a rebrand or dark theme is a token change, not a code change.
+ *
+ * Contrast (WCAG 2.2 AA) was checked for every text/background pair listed in the doc.
+ */
+
+@theme {
+  /* Reset Tailwind's default palette so only Kottakal tokens exist. */
+  --color-*: initial;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* ---- 1. PRIMITIVES ------------------------------------------------- */
+
+  /* BRAND — PROVISIONAL deep teal (replace with the clinic's brand colour). */
+  --color-brand-50: #effaf8;
+  --color-brand-100: #d3f1ec;
+  --color-brand-200: #a7e2d9;
+  --color-brand-300: #6fcbbf;
+  --color-brand-400: #3aaea1;
+  --color-brand-500: #1f9286;
+  --color-brand-600: #15766d; /* white text 5.46:1 */
+  --color-brand-700: #135f59; /* white text 7.48:1 */
+  --color-brand-800: #134d49;
+  --color-brand-900: #12403d;
+  --color-brand-950: #062523;
+
+  /* NEUTRAL — cool slate, slightly warmed for a calm clinical feel. */
+  --color-neutral-0: #ffffff;
+  --color-neutral-25: #fbfcfc;
+  --color-neutral-50: #f6f8f8;
+  --color-neutral-100: #eef1f2;
+  --color-neutral-200: #e1e6e8;
+  --color-neutral-300: #c8d0d4;
+  --color-neutral-400: #9aa6ad;
+  --color-neutral-500: #626e76; /* 5.2:1 on white, 4.9:1 on neutral-50 */
+  --color-neutral-600: #4f5b62; /* 6.99:1 on white */
+  --color-neutral-700: #3a444a;
+  --color-neutral-800: #262e33;
+  --color-neutral-900: #161c20;
+  --color-neutral-950: #0b1013;
+
+  /* WHATSAPP CTA green (darkened from WhatsApp's #25D366 so white text passes AA). */
+  --color-whatsapp-600: #0f7a47; /* white text 5.39:1 */
+  --color-whatsapp-700: #0b6339;
+
+  /* STATUS */
+  --color-success-50: #ecfdf3;
+  --color-success-200: #a6e9c2;
+  --color-success-700: #127242; /* 5.67:1 on success-50 */
+  --color-warning-50: #fff8eb;
+  --color-warning-200: #f9d79a;
+  --color-warning-700: #9a4b06; /* 5.88:1 on warning-50 */
+  --color-danger-50: #fef2f2;
+  --color-danger-200: #f6c1c1;
+  --color-danger-600: #c42b2b; /* white text 5.63:1 */
+  --color-danger-700: #a51f1f; /* 6.8:1 on danger-50 */
+  --color-info-50: #eff7ff;
+  --color-info-200: #b5d8f5;
+  --color-info-700: #1b5f9e; /* 6.11:1 on info-50 */
+  --color-violet-50: #f5f3ff;
+  --color-violet-200: #d6cefb;
+  --color-violet-700: #5b3fb8; /* 6.72:1 on violet-50 */
+
+  /* ---- 2. SEMANTIC -------------------------------------------------- */
+
+  --color-bg: var(--color-neutral-0); /* page background (public) */
+  --color-bg-app: var(--color-neutral-50); /* staff app canvas */
+  --color-bg-subtle: var(--color-neutral-50);
+  --color-bg-muted: var(--color-neutral-100);
+  --color-bg-brand-subtle: var(--color-brand-50);
+  --color-bg-inverse: var(--color-brand-950);
+
+  --color-surface: var(--color-neutral-0); /* cards, tables, panels */
+  --color-surface-raised: var(--color-neutral-0); /* menus, dialogs */
+  --color-overlay: rgb(11 16 19 / 0.48);
+
+  --color-fg: var(--color-neutral-900);
+  --color-fg-muted: var(--color-neutral-600);
+  --color-fg-subtle: var(--color-neutral-500);
+  --color-fg-inverse: var(--color-neutral-0);
+  --color-fg-brand: var(--color-brand-700);
+  --color-fg-link: var(--color-brand-700);
+
+  --color-border: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+  --color-border-brand: var(--color-brand-300);
+
+  --color-primary: var(--color-brand-600);
+  --color-primary-hover: var(--color-brand-700);
+  --color-primary-fg: var(--color-neutral-0);
+  --color-primary-subtle: var(--color-brand-50);
+  --color-primary-subtle-fg: var(--color-brand-800);
+
+  --color-whatsapp: var(--color-whatsapp-600);
+  --color-whatsapp-hover: var(--color-whatsapp-700);
+
+  --color-success: var(--color-success-700);
+  --color-success-bg: var(--color-success-50);
+  --color-success-border: var(--color-success-200);
+  --color-warning: var(--color-warning-700);
+  --color-warning-bg: var(--color-warning-50);
+  --color-warning-border: var(--color-warning-200);
+  --color-danger: var(--color-danger-700);
+  --color-danger-solid: var(--color-danger-600);
+  --color-danger-bg: var(--color-danger-50);
+  --color-danger-border: var(--color-danger-200);
+  --color-info: var(--color-info-700);
+  --color-info-bg: var(--color-info-50);
+  --color-info-border: var(--color-info-200);
+  --color-accent: var(--color-violet-700);
+  --color-accent-bg: var(--color-violet-50);
+  --color-accent-border: var(--color-violet-200);
+
+  --color-ring: var(--color-brand-500);
+
+  /* ---- TYPOGRAPHY --------------------------------------------------- */
+  /* Families are injected by next/font as CSS variables (self-hosted, no Google requests). */
+  --font-sans: var(--font-body, 'Noto Sans'), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-display, 'Figtree'), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Type scale (1.2 minor third at body; display sizes for the public site). */
+  --text-xs: 0.75rem; /* 12px — metadata only, never body copy */
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.6rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.05;
+
+  /* ---- SHAPE & ELEVATION -------------------------------------------- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem; /* controls */
+  --radius-lg: 0.75rem; /* cards */
+  --radius-xl: 1rem; /* public-site feature panels */
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Elevation: borders do most of the work; shadows are soft and rare. */
+  --shadow-xs: 0 1px 2px 0 rgb(22 28 32 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(22 28 32 / 0.08), 0 1px 2px -1px rgb(22 28 32 / 0.06);
+  --shadow-md: 0 4px 12px -2px rgb(22 28 32 / 0.1), 0 2px 4px -2px rgb(22 28 32 / 0.06);
+  --shadow-lg: 0 16px 40px -8px rgb(22 28 32 / 0.18), 0 4px 10px -4px rgb(22 28 32 / 0.08);
+
+  /* ---- BREAKPOINTS (mobile-first) ----------------------------------- */
+  --breakpoint-sm: 40rem; /* 640 */
+  --breakpoint-md: 48rem; /* 768 tablet portrait */
+  --breakpoint-lg: 64rem; /* 1024 tablet landscape / small laptop */
+  --breakpoint-xl: 80rem; /* 1280 */
+  --breakpoint-2xl: 96rem; /* 1536 */
+
+  /* ---- MOTION -------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --animate-fade-in: fade-in 160ms var(--ease-standard);
+  --animate-slide-in-right: slide-in-right 220ms var(--ease-standard);
+  --animate-slide-in-left: slide-in-left 220ms var(--ease-standard);
+  --animate-pop-in: pop-in 160ms var(--ease-standard);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+}
+
+/* ---- 3. COMPONENT-LEVEL & BASE -------------------------------------- */
+@layer base {
+  :root {
+    --control-height: 2.5rem; /* 40px desktop controls */
+    --control-height-touch: 2.75rem; /* 44px minimum touch target */
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One consistent, highly visible focus indicator (WCAG 2.4.7 / 2.4.13). */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-100);
+    color: var(--color-brand-950);
+  }
+
+  /* Tabular numbers wherever figures are compared (tables, money, times). */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

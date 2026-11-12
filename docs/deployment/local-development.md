@@ -39,19 +39,21 @@ Supabase stack on this machine (54321–54324).
 
 ## Commands
 
-| Command              | What it does                                                   |
-| -------------------- | -------------------------------------------------------------- |
-| `pnpm dev`           | Run web, api and worker in watch mode                          |
-| `pnpm build`         | Build every package and app (Turborepo, cached)                |
-| `pnpm lint`          | ESLint (strict type-checked rules) across the workspace        |
-| `pnpm typecheck`     | `tsc --noEmit` across the workspace                            |
-| `pnpm test`          | Vitest in every package                                        |
-| `pnpm format`        | Prettier write. `pnpm format:check` verifies only              |
-| `pnpm check`         | Everything CI runs: format check, lint, typecheck, test, build |
-| `pnpm infra:up/down` | Start or stop the Docker services (data is kept)               |
-| `pnpm infra:logs`    | Follow the Docker service logs                                 |
-| `pnpm infra:reset`   | **Deletes all local data volumes** (asks for confirmation)     |
-| `pnpm health`        | Health table for all services                                  |
+| Command               | What it does                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------- |
+| `pnpm dev`            | Run web, api and worker in watch mode                                                           |
+| `pnpm build`          | Build every package and app (Turborepo, cached)                                                 |
+| `pnpm lint`           | ESLint (strict type-checked rules) across the workspace                                         |
+| `pnpm typecheck`      | `tsc --noEmit` across the workspace                                                             |
+| `pnpm test`           | Vitest in every package                                                                         |
+| `pnpm format`         | Prettier write. `pnpm format:check` verifies only                                               |
+| `pnpm check`          | Everything CI runs: format check, lint, typecheck, test, build                                  |
+| `pnpm infra:up/down`  | Start or stop the Docker services (data is kept)                                                |
+| `pnpm infra:logs`     | Follow the Docker service logs                                                                  |
+| `pnpm infra:reset`    | **Deletes all local data volumes** (asks for confirmation)                                      |
+| `pnpm health`         | Health table for all services                                                                   |
+| `pnpm test:e2e`       | Playwright: axe accessibility, keyboard, overflow checks + screenshots (run `pnpm build` first) |
+| `pnpm check:contrast` | WCAG contrast gate for the design tokens                                                        |
 
 ## Environment variables
 
@@ -65,5 +67,7 @@ and lists every problem, by variable name only (values are never printed).
   volumes, not bind mounts. `core.fileMode=false` is set locally.
 - The Postgres init script (`infrastructure/docker/postgres/init`) runs only when the volume is first
   created. It enables `btree_gist`, `pg_trgm` and `citext` and creates `kmsdc_test`.
+- `virtualStoreDirMaxLength: 60` in `pnpm-workspace.yaml` keeps `.pnpm` symlink targets short. Long
+  targets broke Turbopack on the NTFS3 volume (ADR-023). After changing it, run `CI=true pnpm install`.
 - `pnpm` blocks dependency install scripts unless they are allow-listed in `pnpm-workspace.yaml`.
   Telemetry scripts (`@scarf/scarf`) are deliberately ignored.

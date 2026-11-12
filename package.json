@@ -22,7 +22,9 @@
     "infra:logs": "docker compose logs -f",
     "infra:reset": "node scripts/confirm.mjs \"This deletes ALL local Docker volumes for kmsdc (database, redis, files).\" && docker compose down -v",
     "env:init": "node scripts/setup.mjs",
-    "health": "node scripts/health.mjs"
+    "health": "node scripts/health.mjs",
+    "check:contrast": "python3 -I scripts/check-contrast.py packages/ui/src/styles.css",
+    "test:e2e": "pnpm --filter @kmsdc/web test:e2e"
   },
   "devDependencies": {
     "prettier": "3.10.1",

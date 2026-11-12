@@ -19,3 +19,7 @@ onlyBuiltDependencies:
 # Telemetry-only install scripts we deliberately do not run.
 ignoredBuiltDependencies:
   - '@scarf/scarf'
+
+# Shorter .pnpm store directory names (hashed). Long symlink targets on the NTFS3 dev volume
+# broke Turbopack module resolution (see docs/deployment/local-development.md).
+virtualStoreDirMaxLength: 60

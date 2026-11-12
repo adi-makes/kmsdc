@@ -19,7 +19,7 @@ It brings together:
 
 All of this lives in one modular-monolith web platform.
 
-> **Project status: Phase 1 complete (monorepo and local environment).** The platform foundation runs locally with health checks; business features arrive from Phase 2.
+> **Project status: Phase 2 complete (design system).** The foundation runs locally with health checks, and the shared design system with an interactive reference is at `/app/design-system`. Business features arrive from Phase 3.
 > Phase 1 (monorepo and local environment) is next. See the [roadmap](docs/architecture/roadmap.md).
 
 ---
@@ -88,7 +88,7 @@ pnpm health       # in a second terminal: every service should show ✔
 | Captured emails      | http://localhost:8035 (Mailpit)     |
 | File storage console | http://localhost:9011 (MinIO)       |
 
-Quality gate (the same checks CI runs): `pnpm check`. Stop the infrastructure with `pnpm infra:down`.
+Quality gate (the same checks CI runs): `pnpm check`, then `pnpm test:e2e` (accessibility, keyboard and responsive checks with screenshots in `screenshots/`). Stop the infrastructure with `pnpm infra:down`.
 More detail, including every command and port: [local development guide](docs/deployment/local-development.md).
 
 ## Documentation

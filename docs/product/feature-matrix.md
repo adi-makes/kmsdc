@@ -5,7 +5,7 @@ Status legend: ⬜ Not started · 🟨 In progress · ✅ Done (tested) · 🧪 
 | Module         | Feature                                 | Priority | Phase | Status | Notes                                                      |
 | -------------- | --------------------------------------- | -------- | ----- | ------ | ---------------------------------------------------------- |
 | Foundation     | Monorepo, Docker Compose, health checks | P0       | 1     | ✅     | Phase 1: health endpoints, CI, secret scan                 |
-| Design         | Tokens, component library, showcase     | P0       | 2     | ⬜     | Provisional palette until branding is supplied             |
+| Design         | Tokens, component library, showcase     | P0       | 2     | ✅     | Provisional palette until branding is supplied             |
 | A Website      | Pages, SEO, sitemap, JSON-LD            | P0       | 3     | ⬜     |                                                            |
 | A Website      | WhatsApp CTA                            | P0       | 3     | ⛔     | Needs WhatsApp number (disabled until set)                 |
 | A Website      | Enquiry form                            | P0       | 3/4   | ⬜     | Persisted once the API exists                              |

@@ -2238,3 +2238,44 @@ The end goal is a complete clinic platform that can be tested with synthetic dat
 **Next:** Phase 2, the design system.
 
 ---
+### Response: Phase 2 report (design system and UI/UX foundation)
+
+**Built**
+- **Design direction:** researched with the `ui-ux-pro-max` skill. Swiss-minimal, calm teal with a health-green accent, subtle motion. Brand colours are **provisional** until the clinic supplies its branding.
+- **Tokens** (`packages/ui/src/styles.css`):
+  - Three layers: primitives → semantic → component. Tailwind's default palette is reset, so only tokens exist.
+  - Type scale with Figtree (headings) + Noto Sans (body), self-hosted via `next/font`.
+  - Radii, borders-first elevation, breakpoints, motion and reduced-motion support.
+- **`@kmsdc/ui` components:**
+  - Controls: Button (7 variants, loading, asChild), IconButton (label required), Input, Textarea, NativeSelect/Select, Checkbox, Switch, FormField (wires label/help/error ARIA).
+  - Content: Card, Badge, AppointmentStatusBadge, IntegrationModeBadge, Table.
+  - Overlays: Tabs, Dialog, Drawer, DropdownMenu, Tooltip.
+  - Feedback: Toast, Alert, Skeleton, Empty/Loading/Error states.
+  - Navigation and layout: SkipLink, Breadcrumbs, PageHeader, AppShell (sidebar, top bar, mobile drawer), plus public Container/Section/SectionHeader/Placeholder.
+- **Web app:**
+  - Separate public and staff layouts.
+  - Staff workspace shell at `/app` (`noindex`) with a non-production "synthetic data only" banner driven by `NEXT_PUBLIC_APP_ENV`.
+  - Interactive **design-system showcase** at `/app/design-system`.
+- **QA tooling:**
+  - Playwright + axe-core: WCAG 2.2 A/AA scan, keyboard tests (skip link, drawer focus return, dialog Escape), horizontal-overflow checks and screenshots at 390/834/1440.
+  - `pnpm check:contrast` gate covering 23 token pairs.
+  - Both added to CI, with screenshots uploaded as an artifact.
+
+**Tests:** 46 unit tests (13 new UI accessibility tests) and 18 Playwright tests. All pass, as do contrast 23/23, lint, typecheck, build and format.
+
+**Visual QA:** I reviewed screenshots at all three sizes and fixed five defects:
+- `sr-only` text in tables caused a 151px page overflow on mobile.
+- The mobile drawer didn't return focus.
+- The subtle button was nearly invisible on the canvas.
+- Subtle text had 4.26:1 contrast on the canvas.
+- The environment banner was hidden in optimised builds.
+
+**Issues fixed along the way:** Turbopack hung or failed on long pnpm symlink targets on the NTFS volume, fixed with `virtualStoreDirMaxLength` (ADR-023).
+
+**Needs from the clinic:** logo (SVG), brand colours, fonts (if any) and photography. Swapping them is a token-only change.
+
+**Docs:** design-system.md (direction, tokens, patterns, QA log), component-inventory.md, ux-guidelines.md, ADR-022/023, README, CLAUDE.md.
+
+**Next:** Phase 3, the public website.
+
+---
