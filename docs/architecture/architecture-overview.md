@@ -54,7 +54,6 @@ See the decisions in [`architecture-decisions.md`](./architecture-decisions.md).
 | `packages/validation` | Zod schemas for request/response DTOs and forms (single source of truth) | web, api, worker |
 | `packages/ui` | Design-system components (shadcn/ui-based, customised) and tokens | web |
 | `packages/api-client` | Typed fetch client generated from or aligned with the OpenAPI spec | web |
-
 | `packages/db` *(added in Phase 4, ADR-018)* | Prisma schema, migrations, generated client, seed scripts | api, worker |
 
 Both the API and the worker share one Prisma schema through `packages/db`. This is the one documented

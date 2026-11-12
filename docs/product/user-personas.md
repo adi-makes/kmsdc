@@ -42,7 +42,7 @@
 ## 7. Super Admin — "platform owner / IT"
 - **Context:** Technical owner. Rarely uses the app day to day.
 - **Goals:** System configuration, break-glass access, integrations and secrets setup.
-- **Permissions:** All. Every action is audited. MFA required in production (Phase 12).
+- **Permissions:** All administrative and operational permissions, but **not** clinical finalisation or amendment, prescribing, or clinical marketing approval. Those stay with registered dentists (see the access-control matrix). Every action is audited. MFA required in production (Phase 12).
 
 ## 8. Patient
 - **Context:** A local resident of Pathanamthitta and nearby areas, on a mobile phone. Prefers WhatsApp. Could be any age, including parents booking for children.
