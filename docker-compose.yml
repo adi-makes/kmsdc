@@ -1,0 +1,97 @@
+# Local development infrastructure for the Kottakal Clinic platform.
+# Apps (web/api/worker) run on the host with `pnpm dev`; this file provides their dependencies.
+# Ports are offset to avoid clashes with other local stacks (ADR-016) and overridable via .env.
+# Data lives in named volumes (not bind mounts) because the repo may sit on a non-POSIX drive.
+name: kmsdc
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kmsdc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-kmsdc}
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5442}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    # AOF persistence so queued jobs survive restarts; noeviction is required by BullMQ.
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    ports:
+      - '127.0.0.1:${REDIS_PORT:-6389}:6379'
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio:
+    # Official minio/minio images are no longer published on Docker Hub; Chainguard's
+    # public image is a maintained MinIO build (AGPLv3, local development only).
+    image: cgr.dev/chainguard/minio:latest
+    restart: unless-stopped
+    command: ['server', '/data', '--console-address', ':9001']
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-kmsdc-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+      MC_HOST_local: http://${MINIO_ROOT_USER:-kmsdc-minio}:${MINIO_ROOT_PASSWORD}@localhost:9000
+    ports:
+      - '127.0.0.1:${MINIO_API_PORT:-9010}:9000'
+      - '127.0.0.1:${MINIO_CONSOLE_PORT:-9011}:9001'
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot: creates the private bucket (idempotent) and blocks anonymous access.
+  minio-init:
+    image: cgr.dev/chainguard/minio:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - >-
+        mc mb --ignore-existing local/$${BUCKET} &&
+        mc anonymous set none local/$${BUCKET} &&
+        echo "bucket $${BUCKET} ready (private)"
+    environment:
+      BUCKET: ${S3_BUCKET_PRIVATE:-kmsdc-private}
+      MC_HOST_local: http://${MINIO_ROOT_USER:-kmsdc-minio}:${MINIO_ROOT_PASSWORD}@minio:9000
+    restart: 'no'
+
+  mailpit:
+    # Captures every outgoing email locally; nothing leaves the machine.
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${MAILPIT_SMTP_PORT:-1035}:1025'
+      - '127.0.0.1:${MAILPIT_UI_PORT:-8035}:8025'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://localhost:8025/livez']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:

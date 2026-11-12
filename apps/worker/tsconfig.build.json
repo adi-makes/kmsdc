@@ -1,0 +1,6 @@
+{
+  "extends": "@kmsdc/config/tsconfig/library.json",
+  "compilerOptions": { "declaration": false, "declarationMap": false },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
+}

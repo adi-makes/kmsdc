@@ -24,37 +24,37 @@ fields only. Handlers re-read current state from the DB, which avoids PII in Red
 
 ## 2. Event catalogue (initial)
 
-| Event | Emitted by | Consumers |
-|-------|-----------|-----------|
-| `enquiry.created` | enquiries | automation (acknowledgement), analytics |
-| `conversation.message_received` | communication (webhook) | inbox unread counters, automation (auto-ack outside hours) |
-| `message.status_updated` | communication (webhook) | inbox, campaign stats |
-| `patient.created` / `patient.merged` | patients | analytics, communication (re-link threads) |
-| `consent.granted` / `consent.withdrawn` | consent | automation (cancel pending sends) |
-| `appointment.requested` | scheduling | automation (booking-received message) |
-| `appointment.confirmed` | scheduling | automation (confirmation + schedule reminder) |
-| `appointment.rescheduled` | scheduling | automation (cancel old reminders, schedule new) |
-| `appointment.cancelled` | scheduling | automation (ack, cancel reminders), waiting list |
-| `appointment.checked_in` / `.started` / `.completed` | scheduling | automation (post-visit, review request), analytics |
-| `appointment.no_show` | scheduling | automation (no-show follow-up) |
-| `clinical_note.finalised` / `.amended` | clinical | audit timeline |
-| `treatment_plan.approved` | treatment | billing (suggest invoice), automation (follow-up) |
-| `invoice.issued` / `payment.recorded` / `refund.recorded` | billing | analytics, automation (payment reminders) |
-| `stock.below_minimum` / `batch.expiring` | inventory | automation (inventory alert to admins) |
-| `social_post.approved` / `.published` | marketing | analytics |
+| Event                                                     | Emitted by              | Consumers                                                  |
+| --------------------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| `enquiry.created`                                         | enquiries               | automation (acknowledgement), analytics                    |
+| `conversation.message_received`                           | communication (webhook) | inbox unread counters, automation (auto-ack outside hours) |
+| `message.status_updated`                                  | communication (webhook) | inbox, campaign stats                                      |
+| `patient.created` / `patient.merged`                      | patients                | analytics, communication (re-link threads)                 |
+| `consent.granted` / `consent.withdrawn`                   | consent                 | automation (cancel pending sends)                          |
+| `appointment.requested`                                   | scheduling              | automation (booking-received message)                      |
+| `appointment.confirmed`                                   | scheduling              | automation (confirmation + schedule reminder)              |
+| `appointment.rescheduled`                                 | scheduling              | automation (cancel old reminders, schedule new)            |
+| `appointment.cancelled`                                   | scheduling              | automation (ack, cancel reminders), waiting list           |
+| `appointment.checked_in` / `.started` / `.completed`      | scheduling              | automation (post-visit, review request), analytics         |
+| `appointment.no_show`                                     | scheduling              | automation (no-show follow-up)                             |
+| `clinical_note.finalised` / `.amended`                    | clinical                | audit timeline                                             |
+| `treatment_plan.approved`                                 | treatment               | billing (suggest invoice), automation (follow-up)          |
+| `invoice.issued` / `payment.recorded` / `refund.recorded` | billing                 | analytics, automation (payment reminders)                  |
+| `stock.below_minimum` / `batch.expiring`                  | inventory               | automation (inventory alert to admins)                     |
+| `social_post.approved` / `.published`                     | marketing               | analytics                                                  |
 
 ## 3. Scheduled (cron) jobs: worker repeatable jobs, evaluated in Asia/Kolkata
 
-| Job | Default schedule (IST) | Notes |
-|-----|------------------------|-------|
-| Appointment reminders | Every 15 min scan | Sends at the configured offset (default 24 h before). Idempotency key `reminder:{appointmentId}:{offset}` |
-| Birthday greetings | Daily 09:00 | Promotional consent required |
-| Routine recall | Daily 10:00 | Operational consent. Interval from settings |
-| Pending payment reminders | Weekly, Mon 10:00 | Requires opt-in setting. No amounts in the message body unless configured |
-| Inventory alerts | Daily 08:00 | Staff notification only |
-| Daily clinic report | Daily 20:00 | Aggregates only, to admins |
-| Outbox relay | Continuous (1 s poll) | — |
-| Expired session cleanup | Hourly | — |
+| Job                       | Default schedule (IST) | Notes                                                                                                     |
+| ------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| Appointment reminders     | Every 15 min scan      | Sends at the configured offset (default 24 h before). Idempotency key `reminder:{appointmentId}:{offset}` |
+| Birthday greetings        | Daily 09:00            | Promotional consent required                                                                              |
+| Routine recall            | Daily 10:00            | Operational consent. Interval from settings                                                               |
+| Pending payment reminders | Weekly, Mon 10:00      | Requires opt-in setting. No amounts in the message body unless configured                                 |
+| Inventory alerts          | Daily 08:00            | Staff notification only                                                                                   |
+| Daily clinic report       | Daily 20:00            | Aggregates only, to admins                                                                                |
+| Outbox relay              | Continuous (1 s poll)  | —                                                                                                         |
+| Expired session cleanup   | Hourly                 | —                                                                                                         |
 
 ## 4. Workflow execution model (Phase 9)
 

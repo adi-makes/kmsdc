@@ -1,6 +1,6 @@
 # Privacy design
 
-> **Legal disclaimer:** This document describes *technical* privacy controls. It is not legal advice
+> **Legal disclaimer:** This document describes _technical_ privacy controls. It is not legal advice
 > and does not certify compliance. The Digital Personal Data Protection Act, 2023 (DPDP Act) and the
 > DPDP Rules, plus any health-sector rules (for example the Indian Medical Council / Dental Council
 > record-keeping guidance and Clinical Establishments rules where adopted by Kerala), must be reviewed
@@ -8,25 +8,25 @@
 
 ## 1. Data categories
 
-| Category | Examples | Sensitivity | Who can access |
-|----------|----------|-------------|----------------|
-| Identity & contact | Name, phone, email, address, DOB | High | Clinical + front-desk roles |
-| Clinical | Medical/dental history, allergies, notes, odontogram, X-rays, prescriptions | **Very high** | Dentist, Assistant (limited), audited break-glass |
-| Financial | Invoices, payments, refunds | High | Accountant, admin, reception (collection) |
-| Communication | Message content, phone numbers, delivery status | High | Inbox roles |
-| Marketing | Aggregates, opt-in segment counts | Low (aggregated) | Marketing |
-| Website analytics | Page views, referrer, UTM (first-party, no PII) | Low | Marketing, admin |
+| Category           | Examples                                                                    | Sensitivity      | Who can access                                    |
+| ------------------ | --------------------------------------------------------------------------- | ---------------- | ------------------------------------------------- |
+| Identity & contact | Name, phone, email, address, DOB                                            | High             | Clinical + front-desk roles                       |
+| Clinical           | Medical/dental history, allergies, notes, odontogram, X-rays, prescriptions | **Very high**    | Dentist, Assistant (limited), audited break-glass |
+| Financial          | Invoices, payments, refunds                                                 | High             | Accountant, admin, reception (collection)         |
+| Communication      | Message content, phone numbers, delivery status                             | High             | Inbox roles                                       |
+| Marketing          | Aggregates, opt-in segment counts                                           | Low (aggregated) | Marketing                                         |
+| Website analytics  | Page views, referrer, UTM (first-party, no PII)                             | Low              | Marketing, admin                                  |
 
 ## 2. Consent model (purpose-specific)
 
 `ConsentRecord(patientId, purpose, status, grantedAt, withdrawnAt, source, evidence, recordedById, noticeVersion)`
 
-| Purpose | Required for | Default |
-|---------|--------------|---------|
-| `CLINICAL_PROCESSING` | Creating clinical records (treatment) | Recorded at registration |
-| `OPERATIONAL_COMMS` | Appointment confirmations, reminders, recalls, payment reminders | Asked at registration or enquiry |
-| `PROMOTIONAL_COMMS` | Birthday or festival greetings, campaigns, offers | **Off** unless explicitly opted in |
-| `ANALYTICS` | Optional website analytics cookies | Off. Cookie banner only if non-essential tracking is enabled |
+| Purpose               | Required for                                                     | Default                                                      |
+| --------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| `CLINICAL_PROCESSING` | Creating clinical records (treatment)                            | Recorded at registration                                     |
+| `OPERATIONAL_COMMS`   | Appointment confirmations, reminders, recalls, payment reminders | Asked at registration or enquiry                             |
+| `PROMOTIONAL_COMMS`   | Birthday or festival greetings, campaigns, offers                | **Off** unless explicitly opted in                           |
+| `ANALYTICS`           | Optional website analytics cookies                               | Off. Cookie banner only if non-essential tracking is enabled |
 
 Channel-level preferences are stored separately (`CommunicationPreference`: WhatsApp, SMS, email,
 and quiet hours). A send requires **purpose consent AND channel permission AND that the template's
@@ -47,13 +47,13 @@ history.
 
 ## 4. Data-subject rights (technical support)
 
-| Right | Mechanism |
-|-------|-----------|
-| Access | Admin-generated export of a patient's record (audited). Portal access later |
-| Correction | Update with audit history. Clinical corrections go through amendments |
-| Erasure | Anonymisation workflow, subject to mandatory clinical record retention periods (to be confirmed legally). Financial records are retained as required by tax law |
-| Withdraw consent | Per purpose, immediate effect |
-| Grievance | Grievance officer contact shown in the privacy policy (**placeholder until supplied**) |
+| Right            | Mechanism                                                                                                                                                       |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Access           | Admin-generated export of a patient's record (audited). Portal access later                                                                                     |
+| Correction       | Update with audit history. Clinical corrections go through amendments                                                                                           |
+| Erasure          | Anonymisation workflow, subject to mandatory clinical record retention periods (to be confirmed legally). Financial records are retained as required by tax law |
+| Withdraw consent | Per purpose, immediate effect                                                                                                                                   |
+| Grievance        | Grievance officer contact shown in the privacy policy (**placeholder until supplied**)                                                                          |
 
 ## 5. Retention (to be confirmed by legal review)
 

@@ -23,21 +23,21 @@ follow-ups and marketing are not connected. As a result:
 
 ## 2. Goals
 
-| # | Goal | Measured by (once live) |
-|---|------|--------------------------|
-| G1 | A trustworthy public website that turns visitors into WhatsApp enquiries | WhatsApp CTA clicks, enquiries per week |
-| G2 | Fast, error-free front-desk operations | Time to book/check in; zero double-bookings |
-| G3 | Structured, versioned and auditable dental records | % of encounters with a finalised note |
-| G4 | Accurate billing with no silent changes to financial records | Daily reconciliation matches cash/UPI/card totals |
-| G5 | Reliable automated communication that respects consent | Reminder delivery rate, opt-outs honoured 100% |
-| G6 | Marketing work organised and linked to outcomes | Content published on schedule; enquiry attribution |
-| G7 | Decision-useful analytics built only from real data | Metrics shown with definitions; unavailable ones marked as such |
+| #   | Goal                                                                     | Measured by (once live)                                         |
+| --- | ------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| G1  | A trustworthy public website that turns visitors into WhatsApp enquiries | WhatsApp CTA clicks, enquiries per week                         |
+| G2  | Fast, error-free front-desk operations                                   | Time to book/check in; zero double-bookings                     |
+| G3  | Structured, versioned and auditable dental records                       | % of encounters with a finalised note                           |
+| G4  | Accurate billing with no silent changes to financial records             | Daily reconciliation matches cash/UPI/card totals               |
+| G5  | Reliable automated communication that respects consent                   | Reminder delivery rate, opt-outs honoured 100%                  |
+| G6  | Marketing work organised and linked to outcomes                          | Content published on schedule; enquiry attribution              |
+| G7  | Decision-useful analytics built only from real data                      | Metrics shown with definitions; unavailable ones marked as such |
 
 ## 3. Non-goals (initial release)
 
 - Microservices, multi-tenant SaaS for other clinics, or native mobile apps.
 - Autonomous diagnosis, treatment recommendation or prescription generation (AI may only draft
-  *marketing* copy, and every draft needs human review).
+  _marketing_ copy, and every draft needs human review).
 - Unofficial WhatsApp automation (WhatsApp Web scraping or browser bots). Only the official Meta Cloud API is allowed.
 - Real payment-gateway integration (a mock adapter only, until the owner approves a gateway).
 - Insurance/TPA claims, lab-order integrations and imaging-device (DICOM) integration. These are future scope.
@@ -71,6 +71,7 @@ The full checklist is in [`clinic-information-checklist.md`](./clinic-informatio
 Priority: **P0** = required for the first usable release, **P1** = required for the full product, **P2** = later.
 
 ### A. Public website (Phase 3)
+
 - A-1 P0: Home, About, Services, 8 service detail pages, Doctors, Facilities, FAQs, Contact, Privacy, Terms.
 - A-2 P0: A WhatsApp CTA (`https://wa.me/<number>?text=<prefilled>`) built from configuration, disabled when the number is unset.
 - A-3 P0: SEO, covering unique titles and descriptions, Open Graph, a sitemap, robots, canonical URLs, and `Dentist` JSON-LD with verified fields only.
@@ -79,10 +80,12 @@ Priority: **P0** = required for the first usable release, **P1** = required for 
 - A-6 P1: Mobile sticky booking bar. Lighthouse performance and accessibility of 90 or more on mobile.
 
 ### B. Staff dashboard (Phases 2, 5, 11)
+
 - B-1 P0: Permission-aware widgets for today's appointments, pending requests, completed, cancelled/no-show, new vs returning patients, unread conversations and recent enquiries.
 - B-2 P1: Revenue summary, outstanding payments, follow-ups due and inventory alerts, shown only to roles with the matching permission.
 
 ### C. Patient management (Phase 5)
+
 - C-1 P0: Create, view, update and search (name, phone, patient ID) with pagination and filters.
 - C-2 P0: A human-readable patient ID (for example `KMDC-000123`) alongside the UUID.
 - C-3 P0: Contacts, address, emergency contact, communication preferences and separate consent records.
@@ -91,6 +94,7 @@ Priority: **P0** = required for the first usable release, **P1** = required for 
 - C-6 P1: Tags, and export gated by the `patients.export` permission and audited.
 
 ### D. Appointments (Phase 5)
+
 - D-1 P0: Day, week and month calendar, with per-dentist and per-chair views.
 - D-2 P0: The lifecycle REQUESTED → CONFIRMED → CHECKED_IN → IN_PROGRESS → COMPLETED, plus CANCELLED / NO_SHOW / RESCHEDULED. Transitions are enforced server-side by a state machine.
 - D-3 P0: A double-booking guard enforced in the database by a PostgreSQL exclusion constraint on `(dentist, tstzrange)` and `(chair, tstzrange)` for active states, plus an availability check inside a transaction.
@@ -98,6 +102,7 @@ Priority: **P0** = required for the first usable release, **P1** = required for 
 - D-5 P1: Doctor schedules, clinic hours, appointment types with default durations, and a waiting list.
 
 ### E. Clinical records (Phase 6)
+
 - E-1 P0: Encounter with chief complaint, examination, diagnosis (entered by the dentist), notes and follow-up instructions.
 - E-2 P0: Clinical notes move DRAFT → FINALISED → AMENDED. Finalised content is immutable. Amendments create new versions with author, time and reason.
 - E-3 P0: Odontogram (FDI notation) for permanent (11–48) and primary (51–85) teeth, with surfaces M/O/D/B/L(P)/I, condition types and a per-tooth history.
@@ -105,49 +110,56 @@ Priority: **P0** = required for the first usable release, **P1** = required for 
 - E-5 P1: Clinical documents and X-rays stored in private object storage and viewed through short-lived signed URLs.
 
 ### F. Treatment plans (Phase 6)
+
 - F-1 P0: A multi-item plan with procedure, tooth reference(s), estimate, actual cost, planned visit and status.
 - F-2 P0: Patient approval and consent record. Accepted items can be converted into invoice items.
 
 ### G. Billing (Phase 7)
+
 - G-1 P0: Invoices, items, discounts (permission-gated and audited), partial payments, balances and receipts.
 - G-2 P0: Money is stored as integer paise and totals are recomputed on the server. Payments and refunds are append-only, and a correction is a reversing entry.
 - G-3 P1: Daily reconciliation by method (cash, UPI, card, online) and configurable tax (GST) settings.
 - G-4 P1: A mock payment adapter. A real gateway only after cost approval.
 
 ### H. Inventory (Phase 7)
+
 - H-1 P1: Products, categories, suppliers, batches/expiry, stock movements (in, consume, waste, adjust), minimum-stock alerts and purchase orders.
 
 ### I. Communication (Phase 8)
+
 - I-1 P0: Unified inbox (WhatsApp, web enquiry, email, SMS) with conversations, messages, assignment, internal notes, labels and unread state.
 - I-2 P0: A provider abstraction. The mock provider is clearly labelled **MOCK — not delivered** in the UI.
 - I-3 P0: A consent check before every outbound send, with separate operational and promotional consent, and opt-out handling.
 - I-4 P1: WhatsApp Cloud API adapter with webhook verification (`X-Hub-Signature-256`), dedupe, templates and the 24-hour customer-service window.
 
 ### J. Automation (Phase 9)
+
 - J-1 P0: Transactional outbox → BullMQ. Idempotency key per (workflow, subject, step, scheduled-for).
 - J-2 P1: The 12 initial workflows, with pause/resume, retries with exponential backoff, a dead-letter queue, an execution log and manual approval for campaigns.
 
 ### K. Marketing (Phase 10)
+
 - K-1 P1: Content calendar, drafts, captions, hashtags, media library and approval workflow (dentist sign-off for clinical claims).
 - K-2 P1: Platform adapters (Instagram, Facebook, YouTube, Google Business Profile, LinkedIn), each showing **Connected / Mock / Unavailable / Needs approval**. Manual publishing is always available.
 - K-3 P2: Optional AI drafting. Output is always a draft. A paid LLM API needs cost approval.
 
 ### L. Analytics (Phase 11)
+
 - L-1 P1: Clinic KPIs and the acquisition funnel, computed only from application data. Missing sources show "Unavailable", never zero or estimates.
 - L-2 P1: Date filters, permission-aware views, audited CSV export and documented metric definitions.
 
 ## 7. Non-functional requirements
 
-| Area | Requirement |
-|------|-------------|
-| Security | Server-side RBAC on every endpoint; Argon2id; httpOnly secure cookies; CSRF defence; rate limits; audit logs; private files |
-| Privacy | Purpose-specific consent records; withdrawal; minimal PII in logs and messages; no real data outside production |
-| Reliability | Outbox for domain events; idempotent jobs; DB transactions for money and scheduling |
-| Performance | Staff pages p95 under 500 ms API latency at clinic scale; public site LCP under 2.5 s on 4G |
-| Accessibility | WCAG 2.2 AA target: keyboard operable, visible focus, 4.5:1 contrast, reduced motion |
-| Time | Store UTC (`timestamptz`), display `Asia/Kolkata`; date-only fields (DOB) stored as `date` |
-| Cost | Runs fully locally for free. Every cloud resource needs prior written approval if it can bill |
-| Maintainability | Strict TypeScript, no `any` escapes, module boundaries, tests per module, documentation kept current |
+| Area            | Requirement                                                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Security        | Server-side RBAC on every endpoint; Argon2id; httpOnly secure cookies; CSRF defence; rate limits; audit logs; private files |
+| Privacy         | Purpose-specific consent records; withdrawal; minimal PII in logs and messages; no real data outside production             |
+| Reliability     | Outbox for domain events; idempotent jobs; DB transactions for money and scheduling                                         |
+| Performance     | Staff pages p95 under 500 ms API latency at clinic scale; public site LCP under 2.5 s on 4G                                 |
+| Accessibility   | WCAG 2.2 AA target: keyboard operable, visible focus, 4.5:1 contrast, reduced motion                                        |
+| Time            | Store UTC (`timestamptz`), display `Asia/Kolkata`; date-only fields (DOB) stored as `date`                                  |
+| Cost            | Runs fully locally for free. Every cloud resource needs prior written approval if it can bill                               |
+| Maintainability | Strict TypeScript, no `any` escapes, module boundaries, tests per module, documentation kept current                        |
 
 ## 8. Assumptions
 

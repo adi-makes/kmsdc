@@ -8,6 +8,7 @@ only, no emoji), button hierarchy, form/table/modal/drawer/toast patterns, break
 (with reduced-motion support), along with a `/app/design-system` showcase page.
 
 Two related but distinct expressions:
+
 - **Public website:** premium, calm and trustworthy. Generous whitespace, real photography (when
   supplied), strong WhatsApp CTA, minimal motion.
 - **Staff dashboard:** healthcare SaaS. Dense but readable tables, clear status colour plus text plus

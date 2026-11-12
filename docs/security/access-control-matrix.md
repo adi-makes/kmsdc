@@ -13,72 +13,72 @@ Legend: ✅ allowed · 🔸 limited (see note) · ❌ denied · 🅾 own records
 
 ## Permission catalogue
 
-| Permission | SA | CA | DEN | REC | DA | ACC | MKT | PAT | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| **Administration** |
-| `users.read` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| `users.manage` 📝 | ✅ | 🔸 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | CA cannot create or modify SA users |
-| `roles.manage` 📝 | ✅ | 🔸 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | CA can assign only permissions they hold |
-| `sessions.revoke` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | 🅾 | Anyone can revoke their own sessions |
-| `settings.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | Clinic profile, hours, chairs |
-| `settings.manage` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| `integrations.manage` 📝 | ✅ | 🔸 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | CA: toggle only; secrets set via env by SA |
-| `audit.read` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| **Patients** |
-| `patients.read` | ✅ | ✅ | ✅ | ✅ | ✅ | 🔸 | ❌ | 🅾 | ACC: identity + contact only |
-| `patients.create` | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | |
-| `patients.update` 📝 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 🔸 | PAT: limited contact fields (portal, later) |
-| `patients.merge` 📝 | ✅ | ✅ | ❌ | 🔸 | ❌ | ❌ | ❌ | ❌ | REC: propose; CA approves |
-| `patients.export` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| `patients.delete` 📝 | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Anonymisation per retention policy, not a hard delete |
-| `consent.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | 🅾 | |
-| `consent.manage` 📝 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | 🅾 | Records grant/withdraw with source and evidence |
-| **Scheduling** |
-| `appointments.read` | ✅ | ✅ | ✅ | ✅ | ✅ | 🔸 | ❌ | 🅾 | ACC: date/patient/status only |
-| `appointments.manage` | ✅ | ✅ | ✅ | ✅ | 🔸 | ❌ | ❌ | 🔸 | DA: check-in/start only. PAT: request/cancel own (later) |
-| `schedules.manage` | ✅ | ✅ | 🔸 | ❌ | ❌ | ❌ | ❌ | ❌ | DEN: own availability |
-| **Clinical** |
-| `clinical.read` 📝(access log) | ✅ | 🔸 | ✅ | ❌ | ✅ | ❌ | ❌ | 🔸 | CA: break-glass, logged. PAT: shared summaries only |
-| `clinical.write` | ✅ | ❌ | ✅ | ❌ | 🔸 | ❌ | ❌ | ❌ | DA: drafts / chart proposals only |
-| `clinical.finalise` 📝 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | Dentist only, including SA. Clinical accountability |
-| `clinical.amend` 📝 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | Reason required |
-| `prescriptions.write` 📝 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| `treatment_plans.read` | ✅ | ✅ | ✅ | 🔸 | ✅ | 🔸 | ❌ | 🅾 | REC/ACC: items and costs, no clinical notes |
-| `treatment_plans.write` | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| `treatment_plans.record_approval` 📝 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | Records patient consent/approval |
-| `documents.read` 📝(access log) | ✅ | 🔸 | ✅ | 🔸 | ✅ | ❌ | ❌ | 🅾 | REC: non-clinical docs (ID, consent forms) |
-| `documents.upload` | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | |
-| **Billing** |
-| `billing.read` | ✅ | ✅ | 🔸 | ✅ | ❌ | ✅ | ❌ | 🅾 | DEN: own patients' invoice status |
-| `billing.invoice` | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | |
-| `billing.discount` 📝 | ✅ | ✅ | ❌ | 🔸 | ❌ | ✅ | ❌ | ❌ | REC: up to a configurable limit |
-| `billing.payment` 📝 | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | |
-| `billing.refund` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | Reason required |
-| `billing.void` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | Reversing entry, never a delete |
-| `billing.reconcile` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | |
-| **Inventory** |
-| `inventory.read` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | |
-| `inventory.consume` | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | |
-| `inventory.manage` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | 🔸 | ❌ | ❌ | ACC: purchase orders and suppliers |
-| **Communication** |
-| `inbox.read` | ✅ | ✅ | 🔸 | ✅ | ❌ | ❌ | ❌ | ❌ | DEN: conversations assigned to them |
-| `inbox.reply` | ✅ | ✅ | 🔸 | ✅ | ❌ | ❌ | ❌ | ❌ | |
-| `templates.manage` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 🔸 | ❌ | MKT: promotional templates only |
-| `enquiries.read` | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | 🔸 | ❌ | MKT: aggregate attribution only, no PII |
-| **Automation** |
-| `workflows.read` | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | 🔸 | ❌ | MKT: campaign workflows |
-| `workflows.manage` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | |
-| `workflows.approve` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | Sensitive campaign sends |
-| **Marketing** |
-| `marketing.read` | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | |
-| `marketing.manage` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | Drafts, calendar, media |
-| `marketing.approve_clinical` 📝 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | Dentist sign-off on clinical claims |
-| `marketing.publish` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | Blocked if clinical approval is pending |
-| `campaigns.send` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 🔸 | ❌ | MKT: request; CA approves |
-| **Analytics** |
-| `analytics.clinic` | ✅ | ✅ | 🔸 | ❌ | ❌ | 🔸 | ❌ | ❌ | DEN: own stats. ACC: financial KPIs |
-| `analytics.marketing` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | Aggregated only |
-| `analytics.export` 📝 | ✅ | ✅ | ❌ | ❌ | ❌ | 🔸 | 🔸 | ❌ | Scoped to the role's own analytics |
+| Permission                           | SA  | CA  | DEN | REC | DA  | ACC | MKT | PAT | Notes                                                    |
+| ------------------------------------ | --- | --- | --- | --- | --- | --- | --- | --- | -------------------------------------------------------- |
+| **Administration**                   |
+| `users.read`                         | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `users.manage` 📝                    | ✅  | 🔸  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  | CA cannot create or modify SA users                      |
+| `roles.manage` 📝                    | ✅  | 🔸  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  | CA can assign only permissions they hold                 |
+| `sessions.revoke` 📝                 | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | 🅾   | Anyone can revoke their own sessions                     |
+| `settings.read`                      | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ❌  | Clinic profile, hours, chairs                            |
+| `settings.manage` 📝                 | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `integrations.manage` 📝             | ✅  | 🔸  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  | CA: toggle only; secrets set via env by SA               |
+| `audit.read`                         | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| **Patients**                         |
+| `patients.read`                      | ✅  | ✅  | ✅  | ✅  | ✅  | 🔸  | ❌  | 🅾   | ACC: identity + contact only                             |
+| `patients.create`                    | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `patients.update` 📝                 | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  | ❌  | 🔸  | PAT: limited contact fields (portal, later)              |
+| `patients.merge` 📝                  | ✅  | ✅  | ❌  | 🔸  | ❌  | ❌  | ❌  | ❌  | REC: propose; CA approves                                |
+| `patients.export` 📝                 | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `patients.delete` 📝                 | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  | Anonymisation per retention policy, not a hard delete    |
+| `consent.read`                       | ✅  | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  | 🅾   |                                                          |
+| `consent.manage` 📝                  | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  | ❌  | 🅾   | Records grant/withdraw with source and evidence          |
+| **Scheduling**                       |
+| `appointments.read`                  | ✅  | ✅  | ✅  | ✅  | ✅  | 🔸  | ❌  | 🅾   | ACC: date/patient/status only                            |
+| `appointments.manage`                | ✅  | ✅  | ✅  | ✅  | 🔸  | ❌  | ❌  | 🔸  | DA: check-in/start only. PAT: request/cancel own (later) |
+| `schedules.manage`                   | ✅  | ✅  | 🔸  | ❌  | ❌  | ❌  | ❌  | ❌  | DEN: own availability                                    |
+| **Clinical**                         |
+| `clinical.read` 📝(access log)       | ✅  | 🔸  | ✅  | ❌  | ✅  | ❌  | ❌  | 🔸  | CA: break-glass, logged. PAT: shared summaries only      |
+| `clinical.write`                     | ✅  | ❌  | ✅  | ❌  | 🔸  | ❌  | ❌  | ❌  | DA: drafts / chart proposals only                        |
+| `clinical.finalise` 📝               | ❌  | ❌  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | Dentist only, including SA. Clinical accountability      |
+| `clinical.amend` 📝                  | ❌  | ❌  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | Reason required                                          |
+| `prescriptions.write` 📝             | ❌  | ❌  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `treatment_plans.read`               | ✅  | ✅  | ✅  | 🔸  | ✅  | 🔸  | ❌  | 🅾   | REC/ACC: items and costs, no clinical notes              |
+| `treatment_plans.write`              | ❌  | ❌  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `treatment_plans.record_approval` 📝 | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | Records patient consent/approval                         |
+| `documents.read` 📝(access log)      | ✅  | 🔸  | ✅  | 🔸  | ✅  | ❌  | ❌  | 🅾   | REC: non-clinical docs (ID, consent forms)               |
+| `documents.upload`                   | ✅  | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  | ❌  |                                                          |
+| **Billing**                          |
+| `billing.read`                       | ✅  | ✅  | 🔸  | ✅  | ❌  | ✅  | ❌  | 🅾   | DEN: own patients' invoice status                        |
+| `billing.invoice`                    | ✅  | ✅  | ❌  | ✅  | ❌  | ✅  | ❌  | ❌  |                                                          |
+| `billing.discount` 📝                | ✅  | ✅  | ❌  | 🔸  | ❌  | ✅  | ❌  | ❌  | REC: up to a configurable limit                          |
+| `billing.payment` 📝                 | ✅  | ✅  | ❌  | ✅  | ❌  | ✅  | ❌  | ❌  |                                                          |
+| `billing.refund` 📝                  | ✅  | ✅  | ❌  | ❌  | ❌  | ✅  | ❌  | ❌  | Reason required                                          |
+| `billing.void` 📝                    | ✅  | ✅  | ❌  | ❌  | ❌  | ✅  | ❌  | ❌  | Reversing entry, never a delete                          |
+| `billing.reconcile` 📝               | ✅  | ✅  | ❌  | ❌  | ❌  | ✅  | ❌  | ❌  |                                                          |
+| **Inventory**                        |
+| `inventory.read`                     | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ❌  | ❌  |                                                          |
+| `inventory.consume`                  | ✅  | ✅  | ✅  | ❌  | ✅  | ❌  | ❌  | ❌  |                                                          |
+| `inventory.manage` 📝                | ✅  | ✅  | ❌  | ❌  | ❌  | 🔸  | ❌  | ❌  | ACC: purchase orders and suppliers                       |
+| **Communication**                    |
+| `inbox.read`                         | ✅  | ✅  | 🔸  | ✅  | ❌  | ❌  | ❌  | ❌  | DEN: conversations assigned to them                      |
+| `inbox.reply`                        | ✅  | ✅  | 🔸  | ✅  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `templates.manage` 📝                | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | 🔸  | ❌  | MKT: promotional templates only                          |
+| `enquiries.read`                     | ✅  | ✅  | ❌  | ✅  | ❌  | ❌  | 🔸  | ❌  | MKT: aggregate attribution only, no PII                  |
+| **Automation**                       |
+| `workflows.read`                     | ✅  | ✅  | ❌  | ✅  | ❌  | ❌  | 🔸  | ❌  | MKT: campaign workflows                                  |
+| `workflows.manage` 📝                | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  |                                                          |
+| `workflows.approve` 📝               | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | ❌  | Sensitive campaign sends                                 |
+| **Marketing**                        |
+| `marketing.read`                     | ✅  | ✅  | ✅  | ❌  | ❌  | ❌  | ✅  | ❌  |                                                          |
+| `marketing.manage`                   | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ✅  | ❌  | Drafts, calendar, media                                  |
+| `marketing.approve_clinical` 📝      | ❌  | ❌  | ✅  | ❌  | ❌  | ❌  | ❌  | ❌  | Dentist sign-off on clinical claims                      |
+| `marketing.publish` 📝               | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ✅  | ❌  | Blocked if clinical approval is pending                  |
+| `campaigns.send` 📝                  | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | 🔸  | ❌  | MKT: request; CA approves                                |
+| **Analytics**                        |
+| `analytics.clinic`                   | ✅  | ✅  | 🔸  | ❌  | ❌  | 🔸  | ❌  | ❌  | DEN: own stats. ACC: financial KPIs                      |
+| `analytics.marketing`                | ✅  | ✅  | ❌  | ❌  | ❌  | ❌  | ✅  | ❌  | Aggregated only                                          |
+| `analytics.export` 📝                | ✅  | ✅  | ❌  | ❌  | ❌  | 🔸  | 🔸  | ❌  | Scoped to the role's own analytics                       |
 
 ## Key boundaries (from spec §6), and how they are enforced
 
