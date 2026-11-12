@@ -1,0 +1,91 @@
+# ---------------------------------------------------------------
+# Kottakal Clinic — .gitignore
+# This repository is PUBLIC. Never commit secrets, real clinic
+# data, real patient data, database dumps or uploaded files.
+# ---------------------------------------------------------------
+
+# Secrets & environment files (only .env.example is committed)
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa*
+id_ed25519*
+secrets/
+*.secret
+*.secrets
+credentials*.json
+service-account*.json
+*.tfvars
+!*.example.tfvars
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Data — never commit real or exported data
+*.sql.gz
+*.dump
+*.backup
+backups/
+dumps/
+exports/
+uploads/
+database/local/
+minio-data/
+*.sqlite
+*.sqlite3
+*.db
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+storybook-static/
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+/screenshots/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editors / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code local settings (personal)
+.claude/settings.local.json
+
+# Python caches (tooling scripts)
+__pycache__/
+*.pyc
+.venv/

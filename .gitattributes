@@ -1,0 +1,11 @@
+# Normalise line endings (repo is on an NTFS volume; keep LF in git)
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
