@@ -1,7 +1,7 @@
 'use client';
 
 import { AppShell, Toaster, TooltipProvider, type NavSection } from '@kmsdc/ui';
-import { LayoutDashboard, Palette } from 'lucide-react';
+import { ClipboardCheck, LayoutDashboard, Palette } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -16,7 +16,10 @@ const NAV: readonly NavSection[] = [
   },
   {
     label: 'System',
-    items: [{ href: '/app/design-system', label: 'Design system', icon: Palette }],
+    items: [
+      { href: '/app/setup', label: 'Setup checklist', icon: ClipboardCheck },
+      { href: '/app/design-system', label: 'Design system', icon: Palette },
+    ],
   },
 ];
 

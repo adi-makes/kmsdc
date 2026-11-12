@@ -1,5 +1,11 @@
 import type { HealthReport } from '@kmsdc/types';
-import { apiErrorSchema, healthReportSchema, type ApiError } from '@kmsdc/validation';
+import {
+  apiErrorSchema,
+  enquiryAcceptedSchema,
+  healthReportSchema,
+  type ApiError,
+  type EnquirySubmission,
+} from '@kmsdc/validation';
 import type { z } from 'zod';
 
 export class ApiRequestError extends Error {
@@ -58,6 +64,9 @@ export function createApiClient(options: ApiClientOptions) {
   return {
     request,
     health: (): Promise<HealthReport> => request('GET', '/health', healthReportSchema),
+    /** Public website enquiry (no authentication; rate-limited and spam-checked server-side). */
+    createEnquiry: (body: EnquirySubmission) =>
+      request('POST', '/enquiries', enquiryAcceptedSchema, body),
   };
 }
 

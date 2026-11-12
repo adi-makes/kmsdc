@@ -5,9 +5,20 @@ import { cn } from '../cn.js';
  * Data table primitives. The wrapper scrolls horizontally on small screens instead of
  * breaking the page layout; give the table a caption (visible or sr-only).
  */
-export function TableContainer({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+export function TableContainer({
+  className,
+  label,
+  ...props
+}: HTMLAttributes<HTMLDivElement> & {
+  /** Names the scrollable region for keyboard and screen-reader users (WCAG 2.1.1). */
+  label: string;
+}) {
   return (
     <div
+      role="region"
+      aria-label={label}
+      // Focusable so keyboard users can scroll wide tables horizontally.
+      tabIndex={0}
       className={cn(
         'relative w-full overflow-x-auto rounded-lg border border-border bg-surface',
         className,

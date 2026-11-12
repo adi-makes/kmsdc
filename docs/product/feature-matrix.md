@@ -6,9 +6,9 @@ Status legend: ⬜ Not started · 🟨 In progress · ✅ Done (tested) · 🧪 
 | -------------- | --------------------------------------- | -------- | ----- | ------ | ---------------------------------------------------------- |
 | Foundation     | Monorepo, Docker Compose, health checks | P0       | 1     | ✅     | Phase 1: health endpoints, CI, secret scan                 |
 | Design         | Tokens, component library, showcase     | P0       | 2     | ✅     | Provisional palette until branding is supplied             |
-| A Website      | Pages, SEO, sitemap, JSON-LD            | P0       | 3     | ⬜     |                                                            |
-| A Website      | WhatsApp CTA                            | P0       | 3     | ⛔     | Needs WhatsApp number (disabled until set)                 |
-| A Website      | Enquiry form                            | P0       | 3/4   | ⬜     | Persisted once the API exists                              |
+| A Website      | Pages, SEO, sitemap, JSON-LD            | P0       | 3     | ✅     | Phase 3, static, axe-clean                                 |
+| A Website      | WhatsApp CTA                            | P0       | 3     | ✅     | Built; falls back to enquiry form until number supplied    |
+| A Website      | Enquiry form                            | P0       | 3/4   | 🟨     | UI done (Phase 3); API persistence in Phase 4              |
 | A Website      | Doctors / testimonials                  | P0       | 3     | ⛔     | Hidden until real data is supplied                         |
 | Identity       | Login/logout, sessions, Argon2id        | P0       | 4     | ⬜     |                                                            |
 | Identity       | RBAC + permission guards                | P0       | 4     | ⬜     |                                                            |

@@ -2279,3 +2279,42 @@ The end goal is a complete clinic platform that can be tested with synthetic dat
 **Next:** Phase 3, the public website.
 
 ---
+### Response: Phase 3 report (public website)
+
+**Built**
+- **Pages:** Home, Services, 8 service detail pages (static generation), About, Doctors, Facilities, FAQs, Contact, Privacy (draft), Terms (draft), a branded 404 and a staff `/app/setup` checklist.
+- **Clinic data:** a typed, validated clinic profile (`content/clinic-profile.ts`) holding only the known facts. Everything else is `null`, and the site hides it or shows an honest "coming soon".
+- **WhatsApp booking CTA:** uses a configurable number and a prefilled message. While no number is set, it falls back to "Send an enquiry" and never generates a fake `wa.me` link. There's a sticky mobile booking bar.
+- **Enquiry form:**
+  - Shared Zod schema.
+  - Separate required contact consent and optional promotional consent.
+  - Honeypot, fill-time measurement and UTM/referrer attribution.
+  - Honest success and failure states, with alternative contact routes on failure.
+  - It posts to `/api/v1/enquiries`, which is implemented in Phase 4.
+- **SEO:** unique titles and descriptions, canonical URLs, Open Graph and Twitter metadata, a generated OG image, a sitemap, robots (indexing allowed only in production), and Dentist JSON-LD with verified fields only. All pages are static.
+- **Publishing safety:**
+  - Service content is general education with no prices or promises, and a test bans such language.
+  - Production builds **fail** while service pages lack dentist approval or legal pages lack legal review. I verified this.
+
+**Tests:** 83 Playwright tests:
+- axe WCAG 2.2 AA on 15 pages at desktop and mobile
+- link crawl and SEO uniqueness
+- WhatsApp fallback and JSON-LD contents
+- enquiry validation, success and failure
+- overflow checks and screenshots at 390/834/1440
+
+Plus unit tests for site helpers, schemas and the content guard. Everything passes, along with lint, typecheck, build and contrast.
+
+**Visual QA fixes:**
+- invalid `<dl>` nesting
+- logo accessible name
+- keyboard-scrollable tables
+- CTA widths
+- form-grid misalignment
+- headless font-hinting artifact (Playwright config)
+
+**Needs from the clinic:** WhatsApp number, address, PIN and map, hours, phone and email, verified dentist profiles, facilities, social links, dentist approval of the 8 service pages, and legal review of the privacy policy and terms (with grievance officer details).
+
+**Next:** Phase 4, backend foundation, authentication and permissions.
+
+---

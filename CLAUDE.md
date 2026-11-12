@@ -18,10 +18,11 @@ marketing and analytics. Built phase by phase from the authoritative spec:
 | 0 Inspection & planning | ✅ Complete (2026-11-12)                                  |
 | 1 Monorepo & local env  | ✅ Complete (2026-11-12)                                  |
 | 2 Design system         | ✅ Complete (2026-11-12)                                  |
-| 3 Public website        | ⏭ Next                                                    |
-| 4–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
+| 3 Public website        | ✅ Complete (2026-11-12)                                  |
+| 4 Backend foundation    | ⏭ Next                                                    |
+| 5–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
 
-Foundation + design system (`@kmsdc/ui`, showcase at `/app/design-system`). No business features yet. Feature status lives in [docs/product/feature-matrix.md](docs/product/feature-matrix.md).
+Foundation, design system (`/app/design-system`) and the public website (static, SEO, enquiry form UI). Clinic data lives in `apps/web/src/content/clinic-profile.ts`; see [public-website](docs/product/public-website.md). No backend business modules yet. Feature status lives in [docs/product/feature-matrix.md](docs/product/feature-matrix.md).
 
 ## Locked architecture (change only with a written ADR + owner approval)
 
@@ -87,6 +88,8 @@ MinIO 9010/9011 · Mailpit 1035/8035.
 - Raw-SQL DB objects (exclusion constraints, trigram indexes, REVOKEs) live in migrations and are asserted by tests.
 
 ## UI rules
+
+- Public content: no invented clinic facts; service text needs dentist approval and legal pages need review before production (build-enforced).
 
 - Use `@kmsdc/ui` components and semantic tokens only (no raw hex, no Tailwind default palette, which is reset). See [design-system](docs/design/design-system.md).
 - Components that receive icon components from Server Components must not be in `'use client'` files.

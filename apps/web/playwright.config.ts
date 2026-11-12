@@ -15,6 +15,9 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${String(port)}`,
     trace: 'retain-on-failure',
+    // Headless Chromium's default font hinting mis-spaces small semibold text (e.g. gaps after
+    // "T"); disabling it matches how desktop browsers render, so screenshots are representative.
+    launchOptions: { args: ['--font-render-hinting=none'] },
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

@@ -380,7 +380,7 @@ export function DesignSystemShowcase() {
         title="Data table"
         description="Readable rows, tabular numbers, row actions in a menu. Scrolls inside its container on small screens."
       >
-        <TableContainer>
+        <TableContainer label="Sample appointments">
           <Table>
             <TableCaption>
               Synthetic sample rows for design review — not real patients.

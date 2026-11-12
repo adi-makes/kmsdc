@@ -19,7 +19,7 @@ It brings together:
 
 All of this lives in one modular-monolith web platform.
 
-> **Project status: Phase 2 complete (design system).** The foundation runs locally with health checks, and the shared design system with an interactive reference is at `/app/design-system`. Business features arrive from Phase 3.
+> **Project status: Phase 3 complete (public website).** The public website (all pages, SEO, enquiry form), the design system and the platform foundation run locally. The staff features and API come next.
 > Phase 1 (monorepo and local environment) is next. See the [roadmap](docs/architecture/roadmap.md).
 
 ---
@@ -104,6 +104,9 @@ More detail, including every command and port: [local development guide](docs/de
 | Deployment   | [Local dev](docs/deployment/local-development.md) · [Free-tier strategy](docs/deployment/free-tier-deployment.md) · [Production](docs/deployment/production-deployment.md) · [Backup/restore](docs/deployment/backup-restore.md)                                                                                     |
 
 ## Information needed from the clinic
+
+Staff can see the live list at **http://localhost:3000/app/setup**. Details are entered in
+`apps/web/src/content/clinic-profile.ts` ([guide](docs/product/public-website.md)).
 
 The platform never invents clinic details. Missing items appear as labelled placeholders, or the
 feature is disabled, until supplied. Key items:

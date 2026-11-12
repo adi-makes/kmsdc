@@ -4,6 +4,10 @@ The platform never invents clinic details. Each item below stays a **labelled pl
 Clinic Profile until the clinic provides it. The public site hides or disables any feature whose
 data is missing.
 
+**Where to enter it:** `apps/web/src/content/clinic-profile.ts` (validated at build). The live status is
+shown to staff at `/app/setup`. Service pages also need **dentist approval** and the privacy and terms
+pages need **legal review** before a production build is allowed (see [public-website.md](./public-website.md)).
+
 | #   | Item                                                         | Status                                           | Used by                               | Behaviour while missing                           |
 | --- | ------------------------------------------------------------ | ------------------------------------------------ | ------------------------------------- | ------------------------------------------------- |
 | 1   | Clinic legal / display name                                  | ✅ Known: Kottakal Multispeciality Dental Clinic | Everywhere                            | —                                                 |
