@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@kmsdc/db": "workspace:*",
-    "@nestjs/cli": "11.0.24",
+    "@nestjs/cli": "12.0.15",
     "@nestjs/schematics": "11.1.0",
     "@nestjs/testing": "11.2.9",
     "@swc/core": "1.16.22",
