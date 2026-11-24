@@ -21,8 +21,9 @@ marketing and analytics. Built phase by phase from the authoritative spec:
 | 3 Public website        | ✅ Complete (2026-11-12)                                  |
 | 4 Backend foundation    | ✅ Complete (2026-11-24)                                  |
 | 5 Patients & bookings   | ✅ Complete (2026-11-24)                                  |
-| 6 Clinical records      | ⏭ Next                                                    |
-| 7–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
+| 6 Clinical records      | ✅ Complete (2026-11-24)                                  |
+| 7 Billing & inventory   | ⏭ Next                                                    |
+| 8–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
 
 Foundation, design system (`/app/design-system`) and the public website (static, SEO, enquiry form UI). Clinic data lives in `apps/web/src/content/clinic-profile.ts`; see [public-website](docs/product/public-website.md). No backend business modules yet. Feature status lives in [docs/product/feature-matrix.md](docs/product/feature-matrix.md).
 

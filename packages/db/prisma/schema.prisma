@@ -34,6 +34,8 @@ model Clinic {
   appointments     Appointment[]
   appointmentTypes AppointmentType[]
   chairs           Chair[]
+  encounters       Encounter[]
+  treatmentPlans   TreatmentPlan[]
 }
 
 model Branch {
@@ -111,6 +113,14 @@ model User {
   recordedStatusHistory  AppointmentStatusHistory[] @relation("StatusRecordedBy")
   recordedConsents       PatientConsent[]       @relation("ConsentRecordedBy")
   mergedPatients         PatientMergeRecord[]   @relation("MergedBy")
+  dentistEncounters      Encounter[]            @relation("DentistEncounters")
+  authoredDiagnoses      Diagnosis[]            @relation("AuthoredDiagnoses")
+  authoredNotes          ClinicalNote[]         @relation("AuthoredNotes")
+  authoredNoteVersions   ClinicalNoteVersion[]  @relation("AuthoredNoteVersions")
+  dentistPrescriptions   Prescription[]         @relation("DentistPrescriptions")
+  recordedToothConditions ToothCondition[]      @relation("RecordedToothConditions")
+  dentistTreatmentPlans  TreatmentPlan[]        @relation("DentistTreatmentPlans")
+  updatedMedicalHistories MedicalHistory[]      @relation("MedicalHistoryUpdatedBy")
 }
 
 model Role {
@@ -334,6 +344,12 @@ model Patient {
   sourceEnquiries  Enquiry[]
   sourceMergeLogs  PatientMergeRecord[]     @relation("SourcePatientMerges")
   targetMergeLogs  PatientMergeRecord[]     @relation("TargetPatientMerges")
+  medicalHistory   MedicalHistory?
+  allergies        Allergy[]
+  medications      Medication[]
+  encounters       Encounter[]
+  dentalChart      DentalChart?
+  treatmentPlans   TreatmentPlan[]
 
   @@index([clinicId, status])
   @@index([primaryPhone])
@@ -470,6 +486,7 @@ model Appointment {
   rescheduledFrom Appointment?               @relation("RescheduledAppointments", fields: [rescheduledFromId], references: [id], onDelete: SetNull)
   rescheduledTo   Appointment[]              @relation("RescheduledAppointments")
   statusHistory   AppointmentStatusHistory[]
+  encounters      Encounter[]
 
   @@index([clinicId, startsAt])
   @@index([dentistId, startsAt])
@@ -491,6 +508,274 @@ model AppointmentStatusHistory {
   recordedBy  User?       @relation("StatusRecordedBy", fields: [recordedById], references: [id], onDelete: SetNull)
 
   @@index([appointmentId])
+}
+
+// ─────────────────────────── Clinical Records ───────────────────────────
+
+model MedicalHistory {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  patientId   String   @unique @db.Uuid
+  conditions  Json
+  notes       String?
+  updatedById String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  updatedBy User?   @relation("MedicalHistoryUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+model Allergy {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  patientId String   @db.Uuid
+  substance String
+  severity  String
+  reaction  String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+}
+
+model Medication {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  patientId String   @db.Uuid
+  name      String
+  dosage    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([patientId])
+}
+
+enum EncounterStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Encounter {
+  id             String          @id @default(uuid(7)) @db.Uuid
+  clinicId       String          @db.Uuid
+  patientId      String          @db.Uuid
+  dentistId      String          @db.Uuid
+  appointmentId  String?         @db.Uuid
+  chiefComplaint String
+  examination    String?
+  status         EncounterStatus @default(IN_PROGRESS)
+  startedAt      DateTime        @default(now()) @db.Timestamptz(3)
+  completedAt    DateTime?       @db.Timestamptz(3)
+  createdAt      DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime        @updatedAt @db.Timestamptz(3)
+
+  clinic          Clinic           @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  patient         Patient          @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  dentist         User             @relation("DentistEncounters", fields: [dentistId], references: [id], onDelete: Restrict)
+  appointment     Appointment?     @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  diagnoses       Diagnosis[]
+  notes           ClinicalNote[]
+  prescriptions   Prescription[]
+  toothConditions ToothCondition[]
+
+  @@index([patientId, startedAt])
+  @@index([dentistId, startedAt])
+}
+
+model Diagnosis {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  encounterId String   @db.Uuid
+  description String
+  toothFdi    String?
+  code        String?
+  authorId    String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  encounter Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  author    User      @relation("AuthoredDiagnoses", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([encounterId])
+}
+
+enum ClinicalNoteStatus {
+  DRAFT
+  FINALISED
+  AMENDED
+}
+
+model ClinicalNote {
+  id             String             @id @default(uuid(7)) @db.Uuid
+  encounterId    String             @db.Uuid
+  status         ClinicalNoteStatus @default(DRAFT)
+  currentVersion Int                @default(1)
+  authorId       String             @db.Uuid
+  finalisedAt    DateTime?          @db.Timestamptz(3)
+  createdAt      DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime           @updatedAt @db.Timestamptz(3)
+
+  encounter Encounter             @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  author    User                  @relation("AuthoredNotes", fields: [authorId], references: [id], onDelete: Restrict)
+  versions  ClinicalNoteVersion[]
+
+  @@index([encounterId])
+}
+
+model ClinicalNoteVersion {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  noteId          String   @db.Uuid
+  version         Int
+  content         String
+  amendmentReason String?
+  authorId        String   @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+
+  note   ClinicalNote @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  author User         @relation("AuthoredNoteVersions", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@unique([noteId, version])
+}
+
+enum PrescriptionStatus {
+  ACTIVE
+  DISCONTINUED
+  COMPLETED
+}
+
+model Prescription {
+  id          String             @id @default(uuid(7)) @db.Uuid
+  encounterId String             @db.Uuid
+  dentistId   String             @db.Uuid
+  status      PrescriptionStatus @default(ACTIVE)
+  notes       String?
+  issuedAt    DateTime           @default(now()) @db.Timestamptz(3)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+
+  encounter Encounter          @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  dentist   User               @relation("DentistPrescriptions", fields: [dentistId], references: [id], onDelete: Restrict)
+  items     PrescriptionItem[]
+
+  @@index([encounterId])
+}
+
+model PrescriptionItem {
+  id             String  @id @default(uuid(7)) @db.Uuid
+  prescriptionId String  @db.Uuid
+  drug           String
+  dose           String
+  frequency      String
+  duration       String
+  instructions   String?
+
+  prescription Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  @@index([prescriptionId])
+}
+
+// ──────────────────────────── Dental Chart ──────────────────────────────
+
+enum DentitionType {
+  PERMANENT
+  PRIMARY
+  MIXED
+}
+
+model DentalChart {
+  id        String        @id @default(uuid(7)) @db.Uuid
+  patientId String        @unique @db.Uuid
+  dentition DentitionType @default(PERMANENT)
+  createdAt DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime      @updatedAt @db.Timestamptz(3)
+
+  patient    Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  conditions ToothCondition[]
+}
+
+enum ToothConditionStatus {
+  EXISTING
+  PLANNED
+  COMPLETED
+}
+
+model ToothCondition {
+  id           String               @id @default(uuid(7)) @db.Uuid
+  chartId      String               @db.Uuid
+  toothFdi     String
+  surfaces     String[]
+  condition    String
+  status       ToothConditionStatus @default(EXISTING)
+  material     String?
+  notes        String?
+  encounterId  String?              @db.Uuid
+  recordedById String?              @db.Uuid
+  createdAt    DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime             @updatedAt @db.Timestamptz(3)
+
+  chart      DentalChart @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  encounter  Encounter?  @relation(fields: [encounterId], references: [id], onDelete: SetNull)
+  recordedBy User?       @relation("RecordedToothConditions", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([chartId, toothFdi])
+}
+
+// ─────────────────────────── Treatment Plans ────────────────────────────
+
+enum TreatmentPlanStatus {
+  DRAFT
+  PROPOSED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  DECLINED
+}
+
+enum TreatmentItemStatus {
+  PROPOSED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model TreatmentPlan {
+  id         String              @id @default(uuid(7)) @db.Uuid
+  clinicId   String              @db.Uuid
+  patientId  String              @db.Uuid
+  dentistId  String              @db.Uuid
+  title      String
+  notes      String?
+  status     TreatmentPlanStatus @default(DRAFT)
+  approvedAt DateTime?           @db.Timestamptz(3)
+  createdAt  DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime            @updatedAt @db.Timestamptz(3)
+
+  clinic  Clinic          @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  patient Patient         @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  dentist User            @relation("DentistTreatmentPlans", fields: [dentistId], references: [id], onDelete: Restrict)
+  items   TreatmentItem[]
+
+  @@index([patientId])
+}
+
+model TreatmentItem {
+  id           String              @id @default(uuid(7)) @db.Uuid
+  planId       String              @db.Uuid
+  procedure    String
+  teethFdi     String[]
+  surfaces     String[]
+  estimateCost Int
+  actualCost   Int?
+  plannedVisit Int                 @default(1)
+  status       TreatmentItemStatus @default(PROPOSED)
+  notes        String?
+  createdAt    DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime            @updatedAt @db.Timestamptz(3)
+
+  plan TreatmentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
 }
 
 // ──────────────────────────────── Events ────────────────────────────────

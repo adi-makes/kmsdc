@@ -56,6 +56,16 @@ describe('Patients & Appointments Scheduling Integration Tests', () => {
     await app.init();
 
     prisma = app.get(PrismaService);
+    await prisma.prescriptionItem.deleteMany({});
+    await prisma.prescription.deleteMany({});
+    await prisma.clinicalNoteVersion.deleteMany({});
+    await prisma.clinicalNote.deleteMany({});
+    await prisma.diagnosis.deleteMany({});
+    await prisma.toothCondition.deleteMany({});
+    await prisma.dentalChart.deleteMany({});
+    await prisma.treatmentItem.deleteMany({});
+    await prisma.treatmentPlan.deleteMany({});
+    await prisma.encounter.deleteMany({});
     await prisma.appointmentStatusHistory.deleteMany({});
     await prisma.appointment.deleteMany({});
     await prisma.patientConsent.deleteMany({});

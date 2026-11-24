@@ -2470,4 +2470,53 @@ collapsible blocks.
 
   # Response 5
 
+  Phase 5 Complete: Patient Management & Appointment Scheduling                                                                                                     
+                                                                                                                                                                    
+  1. What was built
   
+  • Database Domain Models & Migrations (@kmsdc/db):
+      • Patients: Patient, PatientConsent, PatientTag, PatientTagAssignment, and PatientMergeRecord.
+      • Appointments: Appointment, AppointmentType, AppointmentStatusHistory, and Chair.
+      • Migration 20261124082526_add_patients_and_appointments applied cleanly to Postgres.
+  • Validation Schemas (@kmsdc/validation):
+      • createPatientSchema, updatePatientSchema, mergePatientSchema, and patientConsentSchema.
+      • createAppointmentSchema, updateAppointmentStatusSchema, and rescheduleAppointmentSchema using standard z.iso.datetime() and z.iso.date().
+  • Patient Management Service & Controller (apps/api/src/patients):
+      • Unique sequential patient IDs per clinic (KMDC-000001, KMDC-000002).
+      • Search by name, phone, or patient ID with pagination.
+      • Tag assignment & consent lifecycle tracking (treatment, operational, promotional).                                                                          
+      • Controlled duplicate patient merge with full snapshot auditing and appointment reassignment.
+  • Appointment Scheduling Engine (apps/api/src/appointments):
+      • Transaction-safe conflict detection preventing double-booking of dentists or chairs.
+      • Appointment lifecycle state machine enforcing valid transitions:
+      REQUESTED ➔ CONFIRMED ➔ CHECKED_IN ➔ IN_PROGRESS ➔ COMPLETED (or CANCELLED, NO_SHOW, RESCHEDULED).
+      • Rescheduling preserves history linking the new appointment back to the previous one.
+      • Transactional outbox event creation (appointment.requested, appointment.confirmed, etc.) for background messaging/reminders.
+  
+  ──────
+  2. Verification & Testing
+  
+  • Integration Tests (apps/api/test/appointments.spec.ts):
+      • Patient creation, demographic retrieval, and consent recording.
+      • Dentist conflict detection returning 409 Conflict on overlapping appointment slots.
+      • Full appointment lifecycle progression and invalid transition rejection (400 Bad Request).
+  • All Quality Gates Passed:
+      • TypeScript strict check: 0 errors.
+      • ESLint type-checked: 0 errors.
+      • Prettier formatting: clean.
+      • Vitest test suites (11 tests in API, 15 in validation, 11 in types, 9 in web): all passing.  
+      • pnpm health: all 6 services healthy (web, api, api-via-proxy, worker, minio, mailpit).
+      • Changes committed (feat(api): patient management, consent tracking and appointment scheduling (Phase 5)) and pushed to origin/main.
+  
+  ──────
+  Next: Phase 6 — Dental Clinical Records, Interactive Odontogram & Treatment Plans (encounters, versioned clinical notes, tooth surfaces, FDI notation odontogram,
+  diagnoses, prescriptions). Ready to proceed whenever you give the word!
+
+
+# Prompt 6
+
+continue
+
+# Response 6
+
+

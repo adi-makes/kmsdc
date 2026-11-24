@@ -19,7 +19,7 @@ It brings together:
 
 All of this lives in one modular-monolith web platform.
 
-> **Project status: Phase 5 complete (Patients & Appointment Scheduling).** The patient management module (demographics, tags, consent logging, duplicate detection & merging) and appointment scheduling (conflict prevention, slot validation, lifecycle transition state machine, transactional outbox events) are implemented and tested. Phase 6 (clinical dental records and odontogram) is next. See the [roadmap](docs/architecture/roadmap.md).
+> **Project status: Phase 6 complete (Dental Clinical Records, Interactive Odontogram & Treatment Plans).** Clinical foundation (encounters, examination, diagnoses, versioned immutable clinical notes, prescriptions, FDI odontogram tooth condition mapping, and multi-visit treatment plans with approval tracking) is implemented and tested. Phase 7 (billing, payments, and inventory ledger) is next. See the [roadmap](docs/architecture/roadmap.md).
 
 ---
 
