@@ -2518,5 +2518,124 @@ collapsible blocks.
 continue
 
 # Response 6
+  Phase 6 Complete: Clinical Dental Records,      
+  Odontogram & Treatment Plans                    
+  
+  1. What was built
+  
+  • Clinical Database Models & Migrations         
+  (@kmsdc/db):
+      • Medical: MedicalHistory, Allergy, and     
+      Medication.
+      • Clinical Encounters: Encounter, Diagnosis,
+      ClinicalNote, ClinicalNoteVersion,          
+      Prescription, and PrescriptionItem.         
+      • Odontogram: DentalChart and ToothCondition.
+      • Treatment Plans: TreatmentPlan and        
+      TreatmentItem.
+      • Migration                                 
+      20261124084347_add_clinical_records applied 
+      cleanly to Postgres.                        
+  • Reference Vocabularies & Schemas (@kmsdc/types
+  & @kmsdc/validation):                           
+      • FDI Two-Digit Notation (ISO 3950): All 32 
+      permanent (11..48) and 20 primary (51..85)  
+      teeth.                                      
+      • Standard tooth surfaces: M (Mesial), D    
+      (Distal), O (Occlusal), I (Incisal), B      
+      (Buccal), F (Facial/Labial), L (Lingual), P 
+      (Palatal).                                  
+      • Tooth conditions: CARIES, RESTORATION,    
+      MISSING, EXTRACTED, EXTRACTION_PLANNED,     
+      ROOT_CANAL_TREATED, CROWN, IMPLANT, etc.    
+      • Zod validation schemas for all clinical   
+      encounter inputs, diagnosis, notes,         
+      amendments, and treatment plans.            
+  • Clinical Module Service & Controller          
+  (apps/api/src/clinical):                        
+      • Clinical encounters linking patients,     
+      dentists, chief complaints, and examination 
+      notes.                                      
+      • Immutable versioned clinical notes:       
+          • Initial creation as DRAFT.            
+          • Once marked FINALISED, notes cannot be
+          modified or overwritten.                
+          • Subsequent edits create versioned     
+          amendments (AMENDED, incrementing       
+          currentVersion) requiring an explicit   
+          audit reason.                           
+      • Multi-item prescriptions with drug name,  
+      dosage, frequency, and instructions.        
+      • Tooth-specific condition tracking on the  
+      patient's dental chart.                     
+      • Multi-visit treatment planning with       
+      integer cost estimates and formal patient   
+      approval recording.                         
+                                                  
+  ──────                                          
+  2. Verification & Testing                       
+                                                  
+  • Integration Tests (apps/api/test/clinical.    
+  spec.ts):                                       
+      • Recording encounters and tooth diagnoses. 
+      • Role-boundary enforcement: Receptionists  
+      attempting clinical note edits receive 403  
+      Forbidden.                                  
+      • Finalisation and multi-version note       
+      amendment verified with audit trails.       
+      • Odontogram tooth condition updates and    
+      treatment plan approval state transitions   
+      verified.                                   
+  • Quality Gates Passed:                         
+      • TypeScript strict mode: 0 errors.         
+      • ESLint type-checked: 0 errors.            
+      • Prettier formatting: clean.               
+      • Vitest test suites (14 tests across API   
+      specs): all passing.
+      • pnpm health: all 6 services healthy (web, 
+      api, api-via-proxy, worker, minio, mailpit).
+      • Git commit (feat(api): clinical records,  
+      odontogram, and treatment planning (Phase   
+      6)) pushed to origin/main.
 
+# Prompt 7
+
+  > no need for billing for now, go to the next one, keep a detailed log of whats all has been one not done etc in readme.
+
+# Response 7
+
+## Phase 8 Complete: Communication Inbox, Messaging Adapters & Consent Gates
+
+### 1. What was built
+
+- **README Status Matrix & Documentation:**
+  - Updated `README.md` with a comprehensive Phase 0–14 feature matrix clearly delineating completed modules (Phases 0–6, Phase 8), deferred modules (Phase 7: Billing & Inventory), and upcoming phases (Automation, Marketing, Analytics, Hardening, Preview, Production).
+- **Communication Database Models & Migrations (`@kmsdc/db`):**
+  - Models: `Conversation`, `Message`, and `MessageTemplate`.
+  - Enums: `CommunicationChannel` (WHATSAPP, SMS, EMAIL, WEB), `ConversationStatus` (OPEN, WAITING_ON_PATIENT, CLOSED), `MessageDirection` (INBOUND, OUTBOUND), `MessageDeliveryStatus` (QUEUED, SENT, DELIVERED, READ, FAILED, MOCK_DELIVERED), and `MessageTemplateCategory` (OPERATIONAL, PROMOTIONAL).
+  - Migration `20261124085949_add_communication_models` applied cleanly to Postgres.
+- **Provider Abstraction & Mock Adapters:**
+  - `IMessagingProvider` interface with clean separation between channel and mock status.
+  - `MockWhatsAppProvider` and `MockSmsProvider` delivering `MOCK_DELIVERED` status without incurring any real Meta Cloud or SMS charges.
+- **Communication Service & REST APIs (`apps/api/src/communication`):**
+  - Conversation thread management with patient linking and assignment.
+  - Message sending with mandatory DPDP Act consent enforcement (blocking promotional messages when promotional consent is absent).
+  - Transactional outbox event emission (`communication.message.sent`) for asynchronous event downstream processing.
+  - Reusable message templates management with RBAC permission enforcement (`inbox.read`, `inbox.reply`, `templates.manage`).
+  - WhatsApp Business Cloud API webhook verification endpoint (`GET /webhooks/whatsapp`) and webhook inbound message receiver (`POST /webhooks/whatsapp`).
+
+### 2. Verification & Testing
+
+- **Integration Tests (`apps/api/test/communication.spec.ts`):**
+  - WhatsApp webhook verification challenge handshake.
+  - Rejection of invalid webhook verification tokens.
+  - Conversation thread creation and outbound message delivery with mock WhatsApp provider.
+  - Strict consent enforcement blocking promotional messages for patients without promotional consent.
+  - Inbound WhatsApp webhook message handling with automatic thread creation/matching.
+- **Quality Gates Passed:**
+  - TypeScript strict mode: 0 errors.
+  - ESLint type-checked: 0 errors.
+  - Prettier formatting: clean.
+  - Vitest test suites (19 tests across API specs): all passing.
+  - `pnpm health`: all 6 services healthy (`web`, `api`, `api via web proxy`, `worker`, `minio`, `mailpit`).
 

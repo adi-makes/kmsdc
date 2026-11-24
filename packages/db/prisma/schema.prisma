@@ -36,6 +36,8 @@ model Clinic {
   chairs           Chair[]
   encounters       Encounter[]
   treatmentPlans   TreatmentPlan[]
+  conversations    Conversation[]
+  messageTemplates MessageTemplate[]
 }
 
 model Branch {
@@ -121,6 +123,8 @@ model User {
   recordedToothConditions ToothCondition[]      @relation("RecordedToothConditions")
   dentistTreatmentPlans  TreatmentPlan[]        @relation("DentistTreatmentPlans")
   updatedMedicalHistories MedicalHistory[]      @relation("MedicalHistoryUpdatedBy")
+  assignedConversations Conversation[]          @relation("AssignedConversations")
+  sentMessages          Message[]               @relation("SentMessages")
 }
 
 model Role {
@@ -350,6 +354,7 @@ model Patient {
   encounters       Encounter[]
   dentalChart      DentalChart?
   treatmentPlans   TreatmentPlan[]
+  conversations    Conversation[]
 
   @@index([clinicId, status])
   @@index([primaryPhone])
@@ -795,3 +800,105 @@ model OutboxEvent {
 
   @@index([publishedAt, occurredAt])
 }
+
+// ───────────────────────────── Communication ────────────────────────────
+
+enum CommunicationChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+  WEB
+}
+
+enum ConversationStatus {
+  OPEN
+  WAITING_ON_PATIENT
+  CLOSED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageDeliveryStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  MOCK_DELIVERED
+}
+
+model Conversation {
+  id           String               @id @default(uuid(7)) @db.Uuid
+  clinicId     String               @db.Uuid
+  patientId    String?              @db.Uuid
+  channel      CommunicationChannel @default(WHATSAPP)
+  status       ConversationStatus   @default(OPEN)
+  assignedToId String?              @db.Uuid
+  subject      String?
+  /// Remote identifier, e.g. E.164 phone number, email address, or web session ID
+  contactPoint String
+  lastMessageAt DateTime            @default(now()) @db.Timestamptz(3)
+  unreadCount  Int                  @default(0)
+  createdAt    DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime             @updatedAt @db.Timestamptz(3)
+
+  clinic     Clinic    @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  patient    Patient?  @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  assignedTo User?     @relation("AssignedConversations", fields: [assignedToId], references: [id], onDelete: SetNull)
+  messages   Message[]
+
+  @@index([clinicId, status])
+  @@index([clinicId, channel])
+  @@index([patientId])
+  @@index([contactPoint])
+}
+
+model Message {
+  id              String                @id @default(uuid(7)) @db.Uuid
+  conversationId  String                @db.Uuid
+  senderId        String?               @db.Uuid
+  direction       MessageDirection
+  body            String
+  channel         CommunicationChannel  @default(WHATSAPP)
+  deliveryStatus  MessageDeliveryStatus @default(QUEUED)
+  providerMessageId String?
+  templateKey     String?
+  metadata        Json?
+  sentAt          DateTime              @default(now()) @db.Timestamptz(3)
+  deliveredAt     DateTime?             @db.Timestamptz(3)
+  readAt          DateTime?             @db.Timestamptz(3)
+  failedReason    String?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User?        @relation("SentMessages", fields: [senderId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, sentAt])
+  @@index([providerMessageId])
+}
+
+enum MessageTemplateCategory {
+  OPERATIONAL
+  PROMOTIONAL
+}
+
+model MessageTemplate {
+  id        String                  @id @default(uuid(7)) @db.Uuid
+  clinicId  String                  @db.Uuid
+  key       String                  @unique
+  name      String
+  category  MessageTemplateCategory @default(OPERATIONAL)
+  channel   CommunicationChannel    @default(WHATSAPP)
+  body      String
+  variables String[]
+  isActive  Boolean                 @default(true)
+  createdAt DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime                @updatedAt @db.Timestamptz(3)
+
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+
+  @@index([clinicId, channel])
+}
+

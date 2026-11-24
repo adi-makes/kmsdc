@@ -19,7 +19,11 @@ It brings together:
 
 All of this lives in one modular-monolith web platform.
 
-> **Project status: Phase 6 complete (Dental Clinical Records, Interactive Odontogram & Treatment Plans).** Clinical foundation (encounters, examination, diagnoses, versioned immutable clinical notes, prescriptions, FDI odontogram tooth condition mapping, and multi-visit treatment plans with approval tracking) is implemented and tested. Phase 7 (billing, payments, and inventory ledger) is next. See the [roadmap](docs/architecture/roadmap.md).
+> **Project status: Phase 8 complete (Communication Inbox & Messaging Adapters).**
+>
+> - Phases 0–6 and Phase 8 are complete and verified across API, Web, and database.
+> - Phase 7 (Billing & Inventory) is deferred for now per project direction.
+> - Next up: **Phase 9 (Automation Engine & Scheduled Reminders)**. See the [roadmap](docs/architecture/roadmap.md).
 
 ---
 
@@ -33,22 +37,25 @@ All of this lives in one modular-monolith web platform.
 - [Project principles](#project-principles)
 - [Development log](#development-log)
 
-## Features
+## Features & Implementation Status
 
-| Area            | What it will do                                                      | Status               |
-| --------------- | -------------------------------------------------------------------- | -------------------- |
-| Public website  | Service pages, SEO, WhatsApp booking CTA, enquiry form               | Planned (Phase 3)    |
-| Staff dashboard | Today's schedule, requests, inbox and alerts, filtered by role       | Planned (Phase 5/11) |
-| Patients        | Search, timeline, consent, duplicate merge                           | Planned (Phase 5)    |
-| Appointments    | Calendar, lifecycle, chair/dentist conflict prevention, waiting list | Planned (Phase 5)    |
-| Clinical        | Encounters, versioned notes, FDI odontogram, prescriptions, X-rays   | Planned (Phase 6)    |
-| Treatment plans | Multi-item plans, estimates, patient approval and consent            | Planned (Phase 6)    |
-| Billing         | Invoices, partial payments, refunds, receipts, daily reconciliation  | Planned (Phase 7)    |
-| Inventory       | Stock, batches/expiry, suppliers, purchase orders, alerts            | Planned (Phase 7)    |
-| Communication   | Unified inbox (WhatsApp, web, email, SMS), templates, consent checks | Planned (Phase 8)    |
-| Automation      | Reminders, recalls, follow-ups, review requests, reports             | Planned (Phase 9)    |
-| Marketing       | Content calendar, approvals, platform adapters                       | Planned (Phase 10)   |
-| Analytics       | Clinic KPIs, acquisition funnel, exports                             | Planned (Phase 11)   |
+| Phase  | Area                          | Scope & Capabilities                                                                                                   | Status                           |
+| :----- | :---------------------------- | :--------------------------------------------------------------------------------------------------------------------- | :------------------------------- |
+| **0**  | **Architecture & Governance** | Master spec, PRD, ADRs (001–023), threat model, permission matrix, roadmap                                             | ✅ **Complete**                  |
+| **1**  | **Monorepo & Foundation**     | Turborepo, pnpm workspaces, NestJS API, Next.js Web, Worker, Docker Compose (PG17, Redis 8, MinIO, Mailpit), CI        | ✅ **Complete**                  |
+| **2**  | **Design System**             | `@kmsdc/ui` component library, tokens, WCAG 2.2 AA accessibility, contrast test suite, `/app/design-system` showcase   | ✅ **Complete**                  |
+| **3**  | **Public Website**            | 15 public pages, SEO/JSON-LD, WhatsApp fallback CTA, responsive layout, validated enquiry form                         | ✅ **Complete**                  |
+| **4**  | **Backend Foundation**        | Argon2id auth, session tokens, CSRF protection, RBAC permission guards, audit logging, Prisma 7 client                 | ✅ **Complete**                  |
+| **5**  | **Patients & Scheduling**     | Patient management, timeline, consent tracking, duplicate record merge, calendar, exclusion-safe appointments          | ✅ **Complete**                  |
+| **6**  | **Clinical Records**          | Medical history, allergies, encounters, immutable versioned notes, prescriptions, FDI odontogram, treatment plans      | ✅ **Complete**                  |
+| **7**  | **Billing & Inventory**       | Invoices, partial payments, receipts, daily cash reconciliation, inventory ledger, batch tracking, purchase orders     | ⏸ **Deferred** (Skipped for now) |
+| **8**  | **Communication System**      | Unified inbox (WhatsApp, SMS, Email, Web), conversation threads, mock/live adapters, templates, consent gate, webhooks | ✅ **Complete**                  |
+| **9**  | **Automation Engine**         | Outbox relay, BullMQ queues, DLQ, automated reminders, recalls, birthday & review workflows                            | 📋 Planned                       |
+| **10** | **Marketing Operations**      | Content calendar, campaign drafts, approvals, media management, social adapters                                        | 📋 Planned                       |
+| **11** | **Analytics & Reporting**     | Clinic KPIs, conversion funnels, financial summaries, CSV/JSON exports                                                 | 📋 Planned                       |
+| **12** | **Production Hardening**      | Security audits, MFA for privileged roles, full E2E Playwright test suite, DR runbooks                                 | 📋 Planned                       |
+| **13** | **Preview Deployment**        | Free-tier deployment configs (Neon/Render/Cloudflare), synthetic seeding                                               | 📋 Planned                       |
+| **14** | **Production Infrastructure** | AWS / scalable cloud architecture, zero-data-loss DR plan, operational runbooks                                        | 📋 Planned                       |
 
 Every external integration (WhatsApp, SMS, email, payments, social) starts as a clearly labelled
 **mock**. Real services are connected only after the owner approves them and their costs.

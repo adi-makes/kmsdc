@@ -7,3 +7,4 @@ export * from './users.js';
 export * from './patient.js';
 export * from './appointment.js';
 export * from './clinical.js';
+export * from './communication.js';
