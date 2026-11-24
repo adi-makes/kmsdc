@@ -1,11 +1,18 @@
 import { type DynamicModule, Global, Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import type { ApiEnv } from '@kmsdc/config/env';
 import { LoggerModule } from 'nestjs-pino';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { buildLoggerParams } from './common/logging/logger.config';
-import { API_ENV } from './config/env';
-import { HealthModule } from './health/health.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
+import { buildLoggerParams } from './common/logging/logger.config.js';
+import { API_ENV } from './config/env.js';
+import { HealthModule } from './health/health.module.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { AuditModule } from './audit/audit.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { AuthGuard } from './auth/guards/auth.guard.js';
+import { UsersModule } from './users/users.module.js';
+import { ClinicModule } from './clinic/clinic.module.js';
+import { EnquiriesModule } from './enquiries/enquiries.module.js';
 
 @Global()
 @Module({})
@@ -27,9 +34,18 @@ export class AppModule {
       imports: [
         EnvModule.register(env),
         LoggerModule.forRoot(buildLoggerParams(env)),
+        PrismaModule,
+        AuditModule,
+        AuthModule,
+        UsersModule,
+        ClinicModule,
+        EnquiriesModule,
         HealthModule,
       ],
-      providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
+      providers: [
+        { provide: APP_FILTER, useClass: AllExceptionsFilter },
+        { provide: APP_GUARD, useClass: AuthGuard },
+      ],
     };
   }
 }

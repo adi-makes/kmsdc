@@ -1,0 +1,279 @@
+// Kottakal Clinic — database schema.
+// Conventions (docs/database/schema-overview.md): UUIDv7 primary keys, timestamptz(3) in UTC,
+// camelCase fields, money in integer paise, clinic/branch ownership on operational tables.
+// Raw-SQL objects (triggers, exclusion constraints, trigram indexes) live in migration files
+// and are asserted by tests — see docs/database/schema-overview.md.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Organisation ─────────────────────────────
+
+model Clinic {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  name      String
+  slug      String   @unique
+  timezone  String   @default("Asia/Kolkata")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  branches  Branch[]
+  settings  ClinicSettings?
+  userRoles UserRole[]
+  roles     Role[]
+  enquiries Enquiry[]
+}
+
+model Branch {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  clinicId  String   @db.Uuid
+  name      String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+
+  @@unique([clinicId, name])
+}
+
+/// Public clinic profile (validated by clinicProfileSchema) and operational settings.
+model ClinicSettings {
+  id                  String   @id @default(uuid(7)) @db.Uuid
+  clinicId            String   @unique @db.Uuid
+  profile             Json
+  patientNumberPrefix String   @default("KMDC")
+  updatedById         String?  @db.Uuid
+  createdAt           DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime @updatedAt @db.Timestamptz(3)
+
+  clinic    Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  updatedBy User?  @relation("SettingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+// ─────────────────────────────── Identity ───────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id                 String     @id @default(uuid(7)) @db.Uuid
+  email              String     @unique @db.Citext
+  fullName           String
+  /// Argon2id hash (never logged, never returned by the API).
+  passwordHash       String
+  status             UserStatus @default(ACTIVE)
+  mustChangePassword Boolean    @default(false)
+  lastLoginAt        DateTime?  @db.Timestamptz(3)
+  passwordChangedAt  DateTime?  @db.Timestamptz(3)
+  createdAt          DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime   @updatedAt @db.Timestamptz(3)
+
+  roles               UserRole[]          @relation("UserRoles")
+  assignedRoles       UserRole[]          @relation("RoleAssignedBy")
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+  settingsUpdates     ClinicSettings[]    @relation("SettingsUpdatedBy")
+  handledEnquiries    Enquiry[]           @relation("EnquiryHandledBy")
+}
+
+model Role {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  /// Null for built-in system roles shared by every clinic.
+  clinicId    String?  @db.Uuid
+  key         String   @unique
+  name        String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  clinic      Clinic?          @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model Permission {
+  id          String @id @default(uuid(7)) @db.Uuid
+  key         String @unique
+  description String
+  module      String
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String @db.Uuid
+  permissionId String @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId       String   @db.Uuid
+  roleId       String   @db.Uuid
+  clinicId     String   @db.Uuid
+  assignedAt   DateTime @default(now()) @db.Timestamptz(3)
+  assignedById String?  @db.Uuid
+
+  user       User   @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  role       Role   @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  clinic     Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  assignedBy User?  @relation("RoleAssignedBy", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  @@id([userId, roleId, clinicId])
+  @@index([roleId])
+}
+
+/// Server-side session (ADR-006). Only the SHA-256 hash of the cookie token is stored.
+model Session {
+  id                String    @id @default(uuid(7)) @db.Uuid
+  userId            String    @db.Uuid
+  tokenHash         String    @unique
+  csrfTokenHash     String
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  lastSeenAt        DateTime  @default(now()) @db.Timestamptz(3)
+  idleExpiresAt     DateTime  @db.Timestamptz(3)
+  absoluteExpiresAt DateTime  @db.Timestamptz(3)
+  revokedAt         DateTime? @db.Timestamptz(3)
+  revokedReason     String?
+  ipAddress         String?
+  userAgent         String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([absoluteExpiresAt])
+}
+
+model PasswordResetToken {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  userId      String    @db.Uuid
+  tokenHash   String    @unique
+  expiresAt   DateTime  @db.Timestamptz(3)
+  usedAt      DateTime? @db.Timestamptz(3)
+  requestedIp String?
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─────────────────────────────── Security ───────────────────────────────
+
+enum ActorType {
+  USER
+  SYSTEM
+  PUBLIC
+}
+
+/// Append-only (UPDATE/DELETE blocked by trigger). Never store full PII in `changes`.
+model AuditLog {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  clinicId   String?   @db.Uuid
+  actorType  ActorType
+  actorId    String?   @db.Uuid
+  action     String
+  entityType String
+  entityId   String?
+  /// Field names changed, with non-sensitive before/after values only.
+  changes    Json?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  requestId  String?
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+/// Append-only record of reads of sensitive data (clinical records, documents, exports).
+model AccessLog {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  clinicId     String   @db.Uuid
+  actorId      String   @db.Uuid
+  resourceType String
+  resourceId   String
+  purpose      String?
+  requestId    String?
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([resourceType, resourceId])
+  @@index([actorId, createdAt])
+}
+
+// ─────────────────────────────── Enquiries ──────────────────────────────
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  CLOSED
+  SPAM
+}
+
+model Enquiry {
+  id                   String        @id @default(uuid(7)) @db.Uuid
+  clinicId             String        @db.Uuid
+  name                 String
+  phone                String
+  email                String?
+  service              String
+  preferredTime        String
+  message              String?
+  status               EnquiryStatus @default(NEW)
+  /// Consent captured with the enquiry (operational contact is required; promotional optional).
+  consentToContact     Boolean
+  consentToPromotions  Boolean       @default(false)
+  consentNoticeVersion String
+  sourcePage           String?
+  referrer             String?
+  utmSource            String?
+  utmMedium            String?
+  utmCampaign          String?
+  /// SHA-256 of the submitter IP + secret (abuse analysis without storing the raw IP).
+  ipHash               String?
+  handledById          String?       @db.Uuid
+  createdAt            DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime      @updatedAt @db.Timestamptz(3)
+
+  clinic    Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  handledBy User?  @relation("EnquiryHandledBy", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([clinicId, status, createdAt])
+  @@index([phone])
+}
+
+// ──────────────────────────────── Events ────────────────────────────────
+
+/// Transactional outbox (ADR-007): written in the same transaction as the state change.
+model OutboxEvent {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  type          String
+  aggregateType String
+  aggregateId   String
+  /// IDs and non-sensitive fields only.
+  payload       Json
+  occurredAt    DateTime  @default(now()) @db.Timestamptz(3)
+  publishedAt   DateTime? @db.Timestamptz(3)
+  attempts      Int       @default(0)
+  lastError     String?
+
+  @@index([publishedAt, occurredAt])
+}

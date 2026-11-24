@@ -21,6 +21,10 @@
     "@nestjs/core": "11.2.9",
     "@nestjs/platform-express": "11.2.9",
     "@nestjs/swagger": "11.4.8",
+    "@node-rs/argon2": "2.2.2",
+    "@prisma/adapter-pg": "7.10.1",
+    "cookie-parser": "^1.4.7",
+    "express-rate-limit": "^8.7.5",
     "helmet": "8.3.0",
     "ioredis": "6.0.0",
     "nestjs-pino": "5.3.1",
@@ -32,10 +36,12 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
+    "@kmsdc/db": "workspace:*",
     "@nestjs/cli": "11.0.24",
     "@nestjs/schematics": "11.1.0",
     "@nestjs/testing": "11.2.9",
     "@swc/core": "1.16.22",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "5.0.6",
     "@types/node": "24.19.2",
     "@types/pg": "8.23.1",

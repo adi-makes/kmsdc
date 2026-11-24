@@ -89,3 +89,6 @@ desktop.ini
 __pycache__/
 *.pyc
 .venv/
+
+# Generated Prisma client (rebuilt by `pnpm build`)
+packages/db/src/generated/

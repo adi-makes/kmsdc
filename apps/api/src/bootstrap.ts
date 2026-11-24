@@ -3,13 +3,27 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { ApiEnv } from '@kmsdc/config/env';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
 
 /** HTTP pipeline shared by main.ts and integration tests so both behave identically. */
 export function configureApp(app: NestExpressApplication, env: ApiEnv): INestApplication {
   app.disable('x-powered-by');
   if (env.TRUST_PROXY) app.set('trust proxy', 1);
   app.use(helmet());
+  app.use(cookieParser());
   app.useBodyParser('json', { limit: '1mb' });
+
+  // Rate limiting: 100 requests per 15 minutes per IP
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 300,
+      standardHeaders: true,
+      legacyHeaders: false,
+    }),
+  );
+
   app.setGlobalPrefix('api/v1');
   app.enableCors({ origin: env.WEB_ORIGIN, credentials: true });
   app.enableShutdownHooks();

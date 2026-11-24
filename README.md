@@ -19,8 +19,7 @@ It brings together:
 
 All of this lives in one modular-monolith web platform.
 
-> **Project status: Phase 3 complete (public website).** The public website (all pages, SEO, enquiry form), the design system and the platform foundation run locally. The staff features and API come next.
-> Phase 1 (monorepo and local environment) is next. See the [roadmap](docs/architecture/roadmap.md).
+> **Project status: Phase 4 complete (Backend foundation, auth & RBAC).** The NestJS backend foundation, Prisma PostgreSQL schema and migrations, Argon2id authentication, session management with CSRF protection, role-based access control, audit logging, enquiry persistence, rate limiting, and synthetic demo seeding are complete and tested. Phase 5 (patient management and appointments) is next. See the [roadmap](docs/architecture/roadmap.md).
 
 ---
 

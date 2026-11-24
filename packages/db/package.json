@@ -1,0 +1,48 @@
+{
+  "name": "@kmsdc/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Prisma schema, migrations, generated client and synthetic seed data (ADR-018)",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "prisma"
+  ],
+  "scripts": {
+    "generate": "prisma generate",
+    "build": "prisma generate && tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "typecheck": "prisma generate && tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "db:seed": "node --env-file=../../.env ./node_modules/tsx/dist/cli.mjs prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "clean": "rm -rf dist .turbo src/generated"
+  },
+  "dependencies": {
+    "@kmsdc/types": "workspace:*",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@kmsdc/config": "workspace:*",
+    "@node-rs/argon2": "2.2.2",
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
+    "eslint": "9.39.5",
+    "prisma": "7.10.1",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
