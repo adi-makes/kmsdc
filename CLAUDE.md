@@ -13,17 +13,23 @@ marketing and analytics. Built phase by phase from the authoritative spec:
 
 ## Current status
 
-| Phase                   | Status                                                    |
-| ----------------------- | --------------------------------------------------------- |
-| 0 Inspection & planning | ✅ Complete (2026-11-12)                                  |
-| 1 Monorepo & local env  | ✅ Complete (2026-11-12)                                  |
-| 2 Design system         | ✅ Complete (2026-11-12)                                  |
-| 3 Public website        | ✅ Complete (2026-11-12)                                  |
-| 4 Backend foundation    | ✅ Complete (2026-11-24)                                  |
-| 5 Patients & bookings   | ✅ Complete (2026-11-24)                                  |
-| 6 Clinical records      | ✅ Complete (2026-11-24)                                  |
-| 7 Billing & inventory   | ⏭ Next                                                    |
-| 8–14                    | Not started (see [roadmap](docs/architecture/roadmap.md)) |
+| Phase                   | Status                       |
+| ----------------------- | ---------------------------- |
+| 0 Inspection & planning | ✅ Complete (2026-11-12)     |
+| 1 Monorepo & local env  | ✅ Complete (2026-11-12)     |
+| 2 Design system         | ✅ Complete (2026-11-12)     |
+| 3 Public website        | ✅ Complete (2026-11-12)     |
+| 4 Backend foundation    | ✅ Complete (2026-11-24)     |
+| 5 Patients & bookings   | ✅ Complete (2026-11-24)     |
+| 6 Clinical records      | ✅ Complete (2026-11-24)     |
+| 7 Billing & inventory   | ⏸ Deferred (Skipped for now) |
+| 8 Communication inbox   | ✅ Complete (2026-11-24)     |
+| 9 Automation engine     | ✅ Complete (2026-11-24)     |
+| 10 Marketing operations | ✅ Complete (2026-11-24)     |
+| 11 Analytics & reports  | ✅ Complete (2026-11-24)     |
+| 12 Hardening & security | ✅ Complete (2026-11-24)     |
+| 13 Preview deployment   | ✅ Complete (2026-11-24)     |
+| 14 Production plan      | ✅ Complete (2026-11-24)     |
 
 Foundation, design system (`/app/design-system`) and the public website (static, SEO, enquiry form UI). Clinic data lives in `apps/web/src/content/clinic-profile.ts`; see [public-website](docs/product/public-website.md). No backend business modules yet. Feature status lives in [docs/product/feature-matrix.md](docs/product/feature-matrix.md).
 

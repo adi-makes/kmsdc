@@ -40,6 +40,9 @@ model Clinic {
   messageTemplates MessageTemplate[]
   workflows        WorkflowDefinition[]
   workflowExecutions WorkflowExecution[]
+  socialAccounts   SocialAccount[]
+  campaigns        MarketingCampaign[]
+  socialPosts      SocialPost[]
 }
 
 model Branch {
@@ -979,5 +982,98 @@ model WorkflowExecution {
   @@index([clinicId, status])
   @@index([scheduledFor, status])
 }
+
+// ────────────────────────────── Marketing ──────────────────────────────
+
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  GOOGLE_BUSINESS
+  LINKEDIN
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  CANCELLED
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_CLINICAL_APPROVAL
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+model SocialAccount {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  clinicId     String         @db.Uuid
+  platform     SocialPlatform
+  accountName  String
+  accountHandle String
+  isMock       Boolean        @default(true)
+  metadata     Json?
+  createdAt    DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime       @updatedAt @db.Timestamptz(3)
+
+  clinic       Clinic         @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  posts        SocialPost[]
+
+  @@unique([clinicId, platform, accountHandle])
+  @@index([clinicId, platform])
+}
+
+model MarketingCampaign {
+  id          String         @id @default(uuid(7)) @db.Uuid
+  clinicId    String         @db.Uuid
+  name        String
+  description String?
+  status      CampaignStatus @default(DRAFT)
+  startDate   DateTime?      @db.Timestamptz(3)
+  endDate     DateTime?      @db.Timestamptz(3)
+  budget      Decimal?       @db.Decimal(10, 2)
+  metrics     Json?
+  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime       @updatedAt @db.Timestamptz(3)
+
+  clinic      Clinic         @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  posts       SocialPost[]
+
+  @@index([clinicId, status])
+}
+
+model SocialPost {
+  id                 String          @id @default(uuid(7)) @db.Uuid
+  clinicId           String          @db.Uuid
+  campaignId         String?         @db.Uuid
+  socialAccountId    String?         @db.Uuid
+  title              String
+  caption            String
+  hashtags           String[]        @default([])
+  mediaUrls          String[]        @default([])
+  status             PostStatus      @default(DRAFT)
+  requiresClinicalReview Boolean     @default(false)
+  clinicalApprovedAt DateTime?       @db.Timestamptz(3)
+  clinicalApprovedById String?       @db.Uuid
+  scheduledAt        DateTime?       @db.Timestamptz(3)
+  publishedAt        DateTime?       @db.Timestamptz(3)
+  publishError       String?
+  createdById        String          @db.Uuid
+  createdAt          DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime        @updatedAt @db.Timestamptz(3)
+
+  clinic             Clinic          @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  campaign           MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  socialAccount      SocialAccount?  @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+
+  @@index([clinicId, status])
+  @@index([clinicId, scheduledAt])
+}
+
 
 

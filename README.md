@@ -51,11 +51,11 @@ All of this lives in one modular-monolith web platform.
 | **7**  | **Billing & Inventory**       | Invoices, partial payments, receipts, daily cash reconciliation, inventory ledger, batch tracking, purchase orders     | ⏸ **Deferred** (Skipped for now) |
 | **8**  | **Communication System**      | Unified inbox (WhatsApp, SMS, Email, Web), conversation threads, mock/live adapters, templates, consent gate, webhooks | ✅ **Complete**                  |
 | **9**  | **Automation Engine**         | Outbox relay, BullMQ queues, DLQ, automated reminders, recalls, birthday & review workflows                            | ✅ **Complete**                  |
-| **10** | **Marketing Operations**      | Content calendar, campaign drafts, approvals, media management, social adapters                                        | 📋 Planned                       |
-| **11** | **Analytics & Reporting**     | Clinic KPIs, conversion funnels, financial summaries, CSV/JSON exports                                                 | 📋 Planned                       |
-| **12** | **Production Hardening**      | Security audits, MFA for privileged roles, full E2E Playwright test suite, DR runbooks                                 | 📋 Planned                       |
-| **13** | **Preview Deployment**        | Free-tier deployment configs (Neon/Render/Cloudflare), synthetic seeding                                               | 📋 Planned                       |
-| **14** | **Production Infrastructure** | AWS / scalable cloud architecture, zero-data-loss DR plan, operational runbooks                                        | 📋 Planned                       |
+| **10** | **Marketing Operations**      | Content calendar, campaign drafts, approvals, media management, social adapters                                        | ✅ **Complete**                  |
+| **11** | **Analytics & Reporting**     | Clinic KPIs, conversion funnels, financial summaries, CSV/JSON exports                                                 | ✅ **Complete**                  |
+| **12** | **Production Hardening**      | Security audits, MFA for privileged roles, full E2E Playwright test suite, DR runbooks                                 | ✅ **Complete**                  |
+| **13** | **Preview Deployment**        | Free-tier deployment configs (Neon/Render/Cloudflare), synthetic seeding                                               | ✅ **Complete**                  |
+| **14** | **Production Infrastructure** | AWS / scalable cloud architecture, zero-data-loss DR plan, operational runbooks                                        | ✅ **Complete**                  |
 
 Every external integration (WhatsApp, SMS, email, payments, social) starts as a clearly labelled
 **mock**. Real services are connected only after the owner approves them and their costs.

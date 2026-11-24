@@ -18,6 +18,8 @@ import { AppointmentsModule } from './appointments/appointments.module.js';
 import { ClinicalModule } from './clinical/clinical.module.js';
 import { CommunicationModule } from './communication/communication.module.js';
 import { AutomationModule } from './automation/automation.module.js';
+import { MarketingModule } from './marketing/marketing.module.js';
+import { AnalyticsModule } from './analytics/analytics.module.js';
 
 @Global()
 @Module({})
@@ -50,6 +52,8 @@ export class AppModule {
         ClinicalModule,
         CommunicationModule,
         AutomationModule,
+        MarketingModule,
+        AnalyticsModule,
         HealthModule,
       ],
       providers: [
