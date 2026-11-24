@@ -3,3 +3,4 @@ export * from './health.js';
 export * from './permissions.js';
 export * from './clinical.js';
 export * from './communication.js';
+export * from './automation.js';

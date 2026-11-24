@@ -17,6 +17,7 @@ import { PatientsModule } from './patients/patients.module.js';
 import { AppointmentsModule } from './appointments/appointments.module.js';
 import { ClinicalModule } from './clinical/clinical.module.js';
 import { CommunicationModule } from './communication/communication.module.js';
+import { AutomationModule } from './automation/automation.module.js';
 
 @Global()
 @Module({})
@@ -48,6 +49,7 @@ export class AppModule {
         AppointmentsModule,
         ClinicalModule,
         CommunicationModule,
+        AutomationModule,
         HealthModule,
       ],
       providers: [

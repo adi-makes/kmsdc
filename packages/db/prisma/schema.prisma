@@ -38,6 +38,8 @@ model Clinic {
   treatmentPlans   TreatmentPlan[]
   conversations    Conversation[]
   messageTemplates MessageTemplate[]
+  workflows        WorkflowDefinition[]
+  workflowExecutions WorkflowExecution[]
 }
 
 model Branch {
@@ -901,4 +903,81 @@ model MessageTemplate {
 
   @@index([clinicId, channel])
 }
+
+// ────────────────────────────── Automation ──────────────────────────────
+
+enum WorkflowTriggerType {
+  APPOINTMENT_SCHEDULED
+  APPOINTMENT_REMINDER_DUE
+  APPOINTMENT_COMPLETED
+  APPOINTMENT_NO_SHOW
+  PATIENT_REGISTERED
+  PATIENT_BIRTHDAY
+  ROUTINE_RECALL_DUE
+  MANUAL_CAMPAIGN
+}
+
+enum WorkflowStatus {
+  ACTIVE
+  PAUSED
+  DRAFT
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  REQUIRES_APPROVAL
+  CANCELLED
+}
+
+model WorkflowDefinition {
+  id          String              @id @default(uuid(7)) @db.Uuid
+  clinicId    String              @db.Uuid
+  key         String              @unique
+  name        String
+  description String?
+  triggerType WorkflowTriggerType
+  status      WorkflowStatus      @default(ACTIVE)
+  /// Criteria and condition expressions (e.g. min hours before appointment, patient tags)
+  conditions  Json?
+  /// Action definition: type (e.g. SEND_MESSAGE), templateKey, delayMinutes, etc.
+  actions     Json
+  requiresApproval Boolean        @default(false)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime            @updatedAt @db.Timestamptz(3)
+
+  clinic     Clinic              @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  executions WorkflowExecution[]
+
+  @@index([clinicId, triggerType])
+  @@index([clinicId, status])
+}
+
+model WorkflowExecution {
+  id           String             @id @default(uuid(7)) @db.Uuid
+  workflowId   String             @db.Uuid
+  clinicId     String             @db.Uuid
+  patientId    String?            @db.Uuid
+  status       ExecutionStatus    @default(PENDING)
+  triggerPayload Json
+  resultPayload  Json?
+  idempotencyKey String           @unique
+  scheduledFor DateTime           @default(now()) @db.Timestamptz(3)
+  executedAt   DateTime?          @db.Timestamptz(3)
+  approvedAt   DateTime?          @db.Timestamptz(3)
+  approvedById String?            @db.Uuid
+  attempts     Int                @default(0)
+  lastError    String?
+  createdAt    DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime           @updatedAt @db.Timestamptz(3)
+
+  workflow   WorkflowDefinition @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  clinic     Clinic             @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+
+  @@index([clinicId, status])
+  @@index([scheduledFor, status])
+}
+
 

@@ -50,7 +50,7 @@ All of this lives in one modular-monolith web platform.
 | **6**  | **Clinical Records**          | Medical history, allergies, encounters, immutable versioned notes, prescriptions, FDI odontogram, treatment plans      | ✅ **Complete**                  |
 | **7**  | **Billing & Inventory**       | Invoices, partial payments, receipts, daily cash reconciliation, inventory ledger, batch tracking, purchase orders     | ⏸ **Deferred** (Skipped for now) |
 | **8**  | **Communication System**      | Unified inbox (WhatsApp, SMS, Email, Web), conversation threads, mock/live adapters, templates, consent gate, webhooks | ✅ **Complete**                  |
-| **9**  | **Automation Engine**         | Outbox relay, BullMQ queues, DLQ, automated reminders, recalls, birthday & review workflows                            | 📋 Planned                       |
+| **9**  | **Automation Engine**         | Outbox relay, BullMQ queues, DLQ, automated reminders, recalls, birthday & review workflows                            | ✅ **Complete**                  |
 | **10** | **Marketing Operations**      | Content calendar, campaign drafts, approvals, media management, social adapters                                        | 📋 Planned                       |
 | **11** | **Analytics & Reporting**     | Clinic KPIs, conversion funnels, financial summaries, CSV/JSON exports                                                 | 📋 Planned                       |
 | **12** | **Production Hardening**      | Security audits, MFA for privileged roles, full E2E Playwright test suite, DR runbooks                                 | 📋 Planned                       |

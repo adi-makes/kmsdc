@@ -2604,38 +2604,126 @@ continue
 
 # Response 7
 
-## Phase 8 Complete: Communication Inbox, Messaging Adapters & Consent Gates
+    ## Phase 8 Complete: Communication Inbox, Messaging Adapters & Consent Gates
 
-### 1. What was built
+    ### 1. What was built
 
-- **README Status Matrix & Documentation:**
-  - Updated `README.md` with a comprehensive Phase 0–14 feature matrix clearly delineating completed modules (Phases 0–6, Phase 8), deferred modules (Phase 7: Billing & Inventory), and upcoming phases (Automation, Marketing, Analytics, Hardening, Preview, Production).
-- **Communication Database Models & Migrations (`@kmsdc/db`):**
-  - Models: `Conversation`, `Message`, and `MessageTemplate`.
-  - Enums: `CommunicationChannel` (WHATSAPP, SMS, EMAIL, WEB), `ConversationStatus` (OPEN, WAITING_ON_PATIENT, CLOSED), `MessageDirection` (INBOUND, OUTBOUND), `MessageDeliveryStatus` (QUEUED, SENT, DELIVERED, READ, FAILED, MOCK_DELIVERED), and `MessageTemplateCategory` (OPERATIONAL, PROMOTIONAL).
-  - Migration `20261124085949_add_communication_models` applied cleanly to Postgres.
-- **Provider Abstraction & Mock Adapters:**
-  - `IMessagingProvider` interface with clean separation between channel and mock status.
-  - `MockWhatsAppProvider` and `MockSmsProvider` delivering `MOCK_DELIVERED` status without incurring any real Meta Cloud or SMS charges.
-- **Communication Service & REST APIs (`apps/api/src/communication`):**
-  - Conversation thread management with patient linking and assignment.
-  - Message sending with mandatory DPDP Act consent enforcement (blocking promotional messages when promotional consent is absent).
-  - Transactional outbox event emission (`communication.message.sent`) for asynchronous event downstream processing.
-  - Reusable message templates management with RBAC permission enforcement (`inbox.read`, `inbox.reply`, `templates.manage`).
-  - WhatsApp Business Cloud API webhook verification endpoint (`GET /webhooks/whatsapp`) and webhook inbound message receiver (`POST /webhooks/whatsapp`).
+    - **README Status Matrix & Documentation:**
+      - Updated `README.md` with a comprehensive Phase 0–14 feature matrix clearly delineating completed modules (Phases 0–6, Phase 8), deferred modules (Phase 7: Billing & Inventory), and upcoming phases (Automation, Marketing, Analytics, Hardening, Preview, Production).
+    - **Communication Database Models & Migrations (`@kmsdc/db`):**
+      - Models: `Conversation`, `Message`, and `MessageTemplate`.
+      - Enums: `CommunicationChannel` (WHATSAPP, SMS, EMAIL, WEB), `ConversationStatus` (OPEN, WAITING_ON_PATIENT, CLOSED), `MessageDirection` (INBOUND, OUTBOUND), `MessageDeliveryStatus` (QUEUED, SENT, DELIVERED, READ, FAILED, MOCK_DELIVERED), and `MessageTemplateCategory` (OPERATIONAL, PROMOTIONAL).
+      - Migration `20261124085949_add_communication_models` applied cleanly to Postgres.
+    - **Provider Abstraction & Mock Adapters:**
+      - `IMessagingProvider` interface with clean separation between channel and mock status.
+      - `MockWhatsAppProvider` and `MockSmsProvider` delivering `MOCK_DELIVERED` status without incurring any real Meta Cloud or SMS charges.
+    - **Communication Service & REST APIs (`apps/api/src/communication`):**
+      - Conversation thread management with patient linking and assignment.
+      - Message sending with mandatory DPDP Act consent enforcement (blocking promotional messages when promotional consent is absent).
+      - Transactional outbox event emission (`communication.message.sent`) for asynchronous event downstream processing.
+      - Reusable message templates management with RBAC permission enforcement (`inbox.read`, `inbox.reply`, `templates.manage`).
+      - WhatsApp Business Cloud API webhook verification endpoint (`GET /webhooks/whatsapp`) and webhook inbound message receiver (`POST /webhooks/whatsapp`).
+
+    ### 2. Verification & Testing
+
+    - **Integration Tests (`apps/api/test/communication.spec.ts`):**
+      - WhatsApp webhook verification challenge handshake.
+      - Rejection of invalid webhook verification tokens.
+      - Conversation thread creation and outbound message delivery with mock WhatsApp provider.
+      - Strict consent enforcement blocking promotional messages for patients without promotional consent.
+      - Inbound WhatsApp webhook message handling with automatic thread creation/matching.
+    - **Quality Gates Passed:**
+      - TypeScript strict mode: 0 errors.
+      - ESLint type-checked: 0 errors.
+      - Prettier formatting: clean.
+      - Vitest test suites (19 tests across API specs): all passing.
+      - `pnpm health`: all 6 services healthy (`web`, `api`, `api via web proxy`, `worker`, `minio`, `mailpit`).
+
+      Phase 8 Complete: Communication Inbox, Messaging Adapters & Webhooks                                                                                              
+                                                                                                                                                                        
+      Per your instruction, Phase 7 (Billing & Inventory) has been deferred for now, and we proceeded directly with Phase 8 (Communication System).                     
+      ──────                                                                                                                                                            
+      1. What Has Been Done                                                                                                                                             
+                                                                                                                                                                        
+      1. Updated Documentation & Roadmap Tracking:                                                                                                                      
+          • Updated README.md with an exhaustive Phase 0–14 feature status table documenting completed modules (Phases 0–6, 8), deferred modules (Phase 7: Billing &    
+          Inventory), and upcoming phases.                                                                                                                              
+          • Appended prompt_responses.md:2601-2645 with the prompt and detailed Phase 8 implementation log.                                                             
+      2. Database Models & Migration (@kmsdc/db):                                                                                                                       
+          • Conversation: Multi-channel thread (WhatsApp, SMS, Email, Web) tracking unread messages, patient associations, staff assignment, and lifecycle statuses     
+          (OPEN, WAITING_ON_PATIENT, CLOSED).                                                                                                                           
+          • Message: Direction (INBOUND, OUTBOUND), delivery states (QUEUED, SENT, DELIVERED, READ, FAILED, MOCK_DELIVERED), and provider message tracking.             
+          • MessageTemplate: Reusable templates categorized as OPERATIONAL or PROMOTIONAL with variables.                                                               
+          • Applied migration 20261124085949_add_communication_models to PostgreSQL.                                                                                    
+      3. Provider Abstraction & Mock Adapters:                                                                                                                          
+          • Abstracted messaging provider interface IMessagingProvider.                                                                                                 
+          • MockWhatsAppProvider and MockSmsProvider delivering MOCK_DELIVERED status without incurring any real Meta Cloud or SMS charges.                             
+      4. Communication Engine & Consent Enforcement (apps/api/src/communication):                                                                                       
+          • Unified Inbox Endpoints:                                                                                                                                    
+              • GET /api/v1/communication/conversations (list threads filtered by channel, status, patient, or assignee).                                               
+              • GET /api/v1/communication/conversations/:id (fetch complete conversation thread).                                                                       
+              • POST /api/v1/communication/conversations (start thread with initial message).                                                                           
+              • PATCH /api/v1/communication/conversations/:id (assign staff or close/reopen).                                                                           
+              • POST /api/v1/communication/conversations/:id/messages (send reply/template).                                                                            
+          • Consent Verification Gate: Strictly checks patient consent (PROMOTIONAL_MESSAGING vs OPERATIONAL_MESSAGING) before dispatching messages. Promotional        
+          messages to patients without consent are blocked with 403 Forbidden.                                                                                          
+          • Transactional Outbox: Emits communication.message.sent events into OutboxEvent for background processing.                                                   
+          • WhatsApp Webhook Handshake & Inbound Handler:                                                                                                               
+              • GET /api/v1/communication/webhooks/whatsapp: Validates Meta Cloud challenge tokens.                                                                     
+              • POST /api/v1/communication/webhooks/whatsapp: Handles inbound messages, associating them with existing threads or registering new conversations.        
+                                                                                                                                                                        
+                                                                                                                                                                        
+      ──────                                                                                                                                                            
+      2. Verification & Testing
+      
+      • Integration Tests (apps/api/test/communication.spec.ts):
+          • Webhook handshake verification & token rejection.
+          • Outbound conversation creation and delivery with mock provider.
+          • Strict DPDP Act consent enforcement blocking promotional sends without consent.
+          • Inbound WhatsApp webhook message parsing and conversation association.
+      • Repository Quality Suite:
+          • pnpm check: Formatting (prettier), Lint (eslint), Typecheck (tsc), Vitest (19 tests across all suites), and Next.js static build all passed cleanly.        
+          • pnpm health: All 6 local services reported healthy (web, api, api via web proxy, worker, minio, mailpit).
+      • Git Safety:
+          • Committed with conventional commit feat(api): communication inbox, messaging adapters, and webhooks (Phase 8) and pushed to origin/main.
+
+# Prompt 8
+
+  > do the next phase. make sure to update necessary files as needed.
+
+# Response 8
+
+Phase 9 Complete: Automation Engine & Workflow Execution
+
+### 1. What Has Been Done
+
+1. **Updated Documentation & Roadmap Tracking:**
+   - Updated `README.md` feature status table marking Phase 9 (Automation Engine) as complete.
+   - Appended `prompt_responses.md` with prompt log and full architectural overview of Phase 9 deliverables.
+2. **Database Models & Migration (`@kmsdc/db`):**
+   - Added `WorkflowDefinition` model representing automation templates (e.g., 24h appointment reminders, recall notices, birthday greetings, campaign broadcasts) with configurable trigger types (`WorkflowTriggerType`), action graphs, and approval gates (`requiresApproval`).
+   - Added `WorkflowExecution` model tracking execution lifecycle (`PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `REQUIRES_APPROVAL`, `CANCELLED`), target patients, triggers, and audit logs.
+   - Generated and applied Prisma migration `20261124093305_add_automation_models`.
+3. **Type Definitions & Zod Schemas (`@kmsdc/types`, `@kmsdc/validation`):**
+   - Added workflow definition and execution schemas with strict payload validation.
+   - Added RBAC permissions `automation.manage` and `automation.trigger`.
+4. **Automation Engine Module (`apps/api/src/automation`):**
+   - Built `AutomationService` orchestrating workflow registration, manual and event-driven triggering, outbox event generation, mock messaging dispatch, and approval gate flows.
+   - Built `AutomationController` with REST endpoints:
+     - `GET /api/v1/automation/workflows` & `POST /api/v1/automation/workflows` (RBAC `automation.manage`).
+     - `GET /api/v1/automation/workflows/:id` & `PATCH /api/v1/automation/workflows/:id` (RBAC `automation.manage`).
+     - `POST /api/v1/automation/trigger` (RBAC `automation.trigger`).
+     - `GET /api/v1/automation/executions` & `GET /api/v1/automation/executions/:id`.
+     - `POST /api/v1/automation/executions/:id/approve` (RBAC `automation.manage`).
+   - Registered `AutomationModule` into `AppModule`.
 
 ### 2. Verification & Testing
 
-- **Integration Tests (`apps/api/test/communication.spec.ts`):**
-  - WhatsApp webhook verification challenge handshake.
-  - Rejection of invalid webhook verification tokens.
-  - Conversation thread creation and outbound message delivery with mock WhatsApp provider.
-  - Strict consent enforcement blocking promotional messages for patients without promotional consent.
-  - Inbound WhatsApp webhook message handling with automatic thread creation/matching.
+- **Integration Tests (`apps/api/test/automation.spec.ts`):**
+  - Workflow creation and RBAC permission barriers (`automation.manage` required for non-admin staff).
+  - Immediate execution of active workflows with automated mock communication dispatch.
+  - Approval flow for sensitive campaigns (pausing in `REQUIRES_APPROVAL` until approved).
 - **Quality Gates Passed:**
-  - TypeScript strict mode: 0 errors.
-  - ESLint type-checked: 0 errors.
-  - Prettier formatting: clean.
-  - Vitest test suites (19 tests across API specs): all passing.
-  - `pnpm health`: all 6 services healthy (`web`, `api`, `api via web proxy`, `worker`, `minio`, `mailpit`).
+  - `pnpm check`: Formatting (Prettier), Lint (ESLint), Typecheck (tsc), Vitest test suites (23 tests), and Next.js static build all passed cleanly.
+
 
