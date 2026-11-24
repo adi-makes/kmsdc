@@ -25,11 +25,15 @@ model Clinic {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-  branches  Branch[]
-  settings  ClinicSettings?
-  userRoles UserRole[]
-  roles     Role[]
-  enquiries Enquiry[]
+  branches         Branch[]
+  settings         ClinicSettings?
+  userRoles        UserRole[]
+  roles            Role[]
+  enquiries        Enquiry[]
+  patients         Patient[]
+  appointments     Appointment[]
+  appointmentTypes AppointmentType[]
+  chairs           Chair[]
 }
 
 model Branch {
@@ -40,9 +44,27 @@ model Branch {
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
-  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  clinic       Clinic        @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  chairs       Chair[]
+  appointments Appointment[]
 
   @@unique([clinicId, name])
+}
+
+model Chair {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  clinicId  String   @db.Uuid
+  branchId  String   @db.Uuid
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  clinic       Clinic        @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  branch       Branch        @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+
+  @@unique([branchId, name])
 }
 
 /// Public clinic profile (validated by clinicProfileSchema) and operational settings.
@@ -79,12 +101,16 @@ model User {
   createdAt          DateTime   @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime   @updatedAt @db.Timestamptz(3)
 
-  roles               UserRole[]          @relation("UserRoles")
-  assignedRoles       UserRole[]          @relation("RoleAssignedBy")
-  sessions            Session[]
-  passwordResetTokens PasswordResetToken[]
-  settingsUpdates     ClinicSettings[]    @relation("SettingsUpdatedBy")
-  handledEnquiries    Enquiry[]           @relation("EnquiryHandledBy")
+  roles                  UserRole[]             @relation("UserRoles")
+  assignedRoles          UserRole[]             @relation("RoleAssignedBy")
+  sessions               Session[]
+  passwordResetTokens    PasswordResetToken[]
+  settingsUpdates        ClinicSettings[]       @relation("SettingsUpdatedBy")
+  handledEnquiries       Enquiry[]              @relation("EnquiryHandledBy")
+  dentistAppointments   Appointment[]          @relation("DentistAppointments")
+  recordedStatusHistory  AppointmentStatusHistory[] @relation("StatusRecordedBy")
+  recordedConsents       PatientConsent[]       @relation("ConsentRecordedBy")
+  mergedPatients         PatientMergeRecord[]   @relation("MergedBy")
 }
 
 model Role {
@@ -250,14 +276,221 @@ model Enquiry {
   /// SHA-256 of the submitter IP + secret (abuse analysis without storing the raw IP).
   ipHash               String?
   handledById          String?       @db.Uuid
+  convertedPatientId   String?       @db.Uuid
   createdAt            DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt            DateTime      @updatedAt @db.Timestamptz(3)
 
-  clinic    Clinic @relation(fields: [clinicId], references: [id], onDelete: Restrict)
-  handledBy User?  @relation("EnquiryHandledBy", fields: [handledById], references: [id], onDelete: SetNull)
+  clinic           Clinic   @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  handledBy        User?    @relation("EnquiryHandledBy", fields: [handledById], references: [id], onDelete: SetNull)
+  convertedPatient Patient? @relation(fields: [convertedPatientId], references: [id], onDelete: SetNull)
 
   @@index([clinicId, status, createdAt])
   @@index([phone])
+}
+
+// ──────────────────────────────── Patients ───────────────────────────────
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNDISCLOSED
+}
+
+enum PatientStatus {
+  ACTIVE
+  INACTIVE
+  MERGED
+  ANONYMISED
+}
+
+model Patient {
+  id               String        @id @default(uuid(7)) @db.Uuid
+  clinicId         String        @db.Uuid
+  patientNumber    String        @unique
+  fullName         String
+  dateOfBirth      DateTime?     @db.Date
+  gender           Gender        @default(UNDISCLOSED)
+  primaryPhone     String
+  email            String?       @db.Citext
+  emergencyContact String?
+  emergencyPhone   String?
+  addressLine1     String?
+  city             String?
+  state            String?
+  postalCode       String?
+  status           PatientStatus @default(ACTIVE)
+  mergedIntoId     String?       @db.Uuid
+  notes            String?
+  createdAt        DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime      @updatedAt @db.Timestamptz(3)
+
+  clinic           Clinic                   @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  mergedInto       Patient?                 @relation("PatientMerges", fields: [mergedIntoId], references: [id], onDelete: Restrict)
+  mergedFrom       Patient[]                @relation("PatientMerges")
+  appointments     Appointment[]
+  consents         PatientConsent[]
+  tags             PatientTagAssignment[]
+  sourceEnquiries  Enquiry[]
+  sourceMergeLogs  PatientMergeRecord[]     @relation("SourcePatientMerges")
+  targetMergeLogs  PatientMergeRecord[]     @relation("TargetPatientMerges")
+
+  @@index([clinicId, status])
+  @@index([primaryPhone])
+  @@index([fullName])
+}
+
+model PatientTag {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  clinicId  String   @db.Uuid
+  name      String
+  color     String   @default("#0d9488")
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  assignments PatientTagAssignment[]
+
+  @@unique([clinicId, name])
+}
+
+model PatientTagAssignment {
+  patientId String @db.Uuid
+  tagId     String @db.Uuid
+
+  patient Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  tag     PatientTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([patientId, tagId])
+}
+
+enum ConsentPurpose {
+  CLINICAL_TREATMENT
+  OPERATIONAL_MESSAGING
+  PROMOTIONAL_MESSAGING
+}
+
+enum ConsentStatus {
+  GRANTED
+  WITHDRAWN
+}
+
+model PatientConsent {
+  id            String         @id @default(uuid(7)) @db.Uuid
+  patientId     String         @db.Uuid
+  purpose       ConsentPurpose
+  status        ConsentStatus  @default(GRANTED)
+  noticeVersion String
+  effectiveAt   DateTime       @default(now()) @db.Timestamptz(3)
+  recordedById  String?        @db.Uuid
+  notes         String?
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+
+  patient    Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  recordedBy User?   @relation("ConsentRecordedBy", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([patientId, purpose, status])
+}
+
+model PatientMergeRecord {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  sourcePatientId String   @db.Uuid
+  targetPatientId String   @db.Uuid
+  snapshot        Json
+  reason          String?
+  mergedById      String?  @db.Uuid
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+
+  sourcePatient Patient @relation("SourcePatientMerges", fields: [sourcePatientId], references: [id], onDelete: Restrict)
+  targetPatient Patient @relation("TargetPatientMerges", fields: [targetPatientId], references: [id], onDelete: Restrict)
+  mergedBy      User?   @relation("MergedBy", fields: [mergedById], references: [id], onDelete: SetNull)
+
+  @@index([sourcePatientId])
+  @@index([targetPatientId])
+}
+
+// ────────────────────────────── Scheduling ──────────────────────────────
+
+enum AppointmentStatus {
+  REQUESTED
+  CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  RESCHEDULED
+}
+
+enum AppointmentSource {
+  WHATSAPP
+  WEB
+  PHONE
+  WALK_IN
+}
+
+model AppointmentType {
+  id                 String   @id @default(uuid(7)) @db.Uuid
+  clinicId           String   @db.Uuid
+  name               String
+  defaultDurationMin Int      @default(30)
+  color              String   @default("#0d9488")
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(3)
+
+  clinic       Clinic        @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+
+  @@unique([clinicId, name])
+}
+
+model Appointment {
+  id                String            @id @default(uuid(7)) @db.Uuid
+  clinicId          String            @db.Uuid
+  branchId          String            @db.Uuid
+  patientId         String            @db.Uuid
+  dentistId         String            @db.Uuid
+  chairId           String?           @db.Uuid
+  typeId            String            @db.Uuid
+  status            AppointmentStatus @default(REQUESTED)
+  source            AppointmentSource @default(PHONE)
+  startsAt          DateTime          @db.Timestamptz(3)
+  endsAt            DateTime          @db.Timestamptz(3)
+  notes             String?
+  cancellationReason String?
+  rescheduledFromId String?           @db.Uuid
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @db.Timestamptz(3)
+
+  clinic          Clinic                     @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  branch          Branch                     @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  patient         Patient                    @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  dentist         User                       @relation("DentistAppointments", fields: [dentistId], references: [id], onDelete: Restrict)
+  chair           Chair?                     @relation(fields: [chairId], references: [id], onDelete: SetNull)
+  type            AppointmentType            @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  rescheduledFrom Appointment?               @relation("RescheduledAppointments", fields: [rescheduledFromId], references: [id], onDelete: SetNull)
+  rescheduledTo   Appointment[]              @relation("RescheduledAppointments")
+  statusHistory   AppointmentStatusHistory[]
+
+  @@index([clinicId, startsAt])
+  @@index([dentistId, startsAt])
+  @@index([patientId, startsAt])
+  @@index([chairId, startsAt])
+  @@index([status])
+}
+
+model AppointmentStatusHistory {
+  id            String            @id @default(uuid(7)) @db.Uuid
+  appointmentId String            @db.Uuid
+  fromStatus    AppointmentStatus
+  toStatus      AppointmentStatus
+  recordedById  String?           @db.Uuid
+  reason        String?
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  recordedBy  User?       @relation("StatusRecordedBy", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@index([appointmentId])
 }
 
 // ──────────────────────────────── Events ────────────────────────────────

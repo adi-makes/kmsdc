@@ -19,7 +19,7 @@ It brings together:
 
 All of this lives in one modular-monolith web platform.
 
-> **Project status: Phase 4 complete (Backend foundation, auth & RBAC).** The NestJS backend foundation, Prisma PostgreSQL schema and migrations, Argon2id authentication, session management with CSRF protection, role-based access control, audit logging, enquiry persistence, rate limiting, and synthetic demo seeding are complete and tested. Phase 5 (patient management and appointments) is next. See the [roadmap](docs/architecture/roadmap.md).
+> **Project status: Phase 5 complete (Patients & Appointment Scheduling).** The patient management module (demographics, tags, consent logging, duplicate detection & merging) and appointment scheduling (conflict prevention, slot validation, lifecycle transition state machine, transactional outbox events) are implemented and tested. Phase 6 (clinical dental records and odontogram) is next. See the [roadmap](docs/architecture/roadmap.md).
 
 ---
 

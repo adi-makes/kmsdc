@@ -13,6 +13,8 @@ import { AuthGuard } from './auth/guards/auth.guard.js';
 import { UsersModule } from './users/users.module.js';
 import { ClinicModule } from './clinic/clinic.module.js';
 import { EnquiriesModule } from './enquiries/enquiries.module.js';
+import { PatientsModule } from './patients/patients.module.js';
+import { AppointmentsModule } from './appointments/appointments.module.js';
 
 @Global()
 @Module({})
@@ -40,6 +42,8 @@ export class AppModule {
         UsersModule,
         ClinicModule,
         EnquiriesModule,
+        PatientsModule,
+        AppointmentsModule,
         HealthModule,
       ],
       providers: [
