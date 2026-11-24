@@ -2795,3 +2795,93 @@ continue
   ### 6. Verification & Quality Gates
 
   - `pnpm check`: Formatting (Prettier), Lint (ESLint), Typecheck (tsc), Vitest test suites (27 tests across all packages), and Next.js static build all passed cleanly.
+
+  All remaining phases (Phases 10 through 14) have been completed phase by phase, verified, documented, and pushed to the repository.
+  ──────
+  Phase-by-Phase Summary of Completed Work
+  
+  1. Phase 10 — Marketing Operations & Content Approval
+  
+  • Data Layer & Migrations (@kmsdc/db):
+      • Added SocialPlatform, CampaignStatus, and PostStatus enums.
+      • Added models: SocialAccount, MarketingCampaign, and SocialPost.
+      • Applied migration 20261124101906_add_marketing_models.
+  • API Module (apps/api/src/marketing):
+      • Endpoints for managing social channel accounts, marketing campaigns, post drafts, and scheduled social content. 
+      • Clinical Approval Gate: Posts containing clinical or medical claims strictly require registered dentist approval (marketing.approve_clinical) before publishing is
+      permitted.                                                                                                                                                                  
+      • Outbox integration emitting marketing.post.published events.                                                                                                              
+  • Integration Tests: apps/api/test/marketing.spec.ts.                                                                                                                           
+  
+  2. Phase 11 — Analytics & Reporting
+  
+  • API Module (apps/api/src/analytics):
+      • /api/v1/analytics/kpis: Aggregated clinic KPIs (patient growth, appointment completion vs. no-show rates, active treatment plans, and conversation counts).
+      • /api/v1/analytics/funnel: 5-stage patient acquisition funnel (Enquiries → Registered → Booked → Completed Visits → Treatment Accepted).
+      • /api/v1/analytics/export: Audited CSV summary export protected by analytics.export RBAC permission.
+  • Integration Tests: apps/api/test/analytics.spec.ts.                                                                                                                           
+  
+  3. Phase 12 — Production Hardening & Security Audit
+                                                                                                                                                                                  
+  • Security and compliance review document: docs/security/security-hardening-audit.md.                                                                                           
+  • Verified controls: Argon2id password hashing, CSRF dual-token enforcement, session entropy and timeout lifecycle, immutable audit trail, and DPDP Act granular consent        
+  separation.
+  • Prepared RFC 6238 TOTP multi-factor authentication (MFA) blueprint for privileged administrative and dentist accounts.
+  
+  4. Phase 13 — Preview Deployment Runbook
+  
+  • Detailed zero-cost cloud staging runbook: docs/deployment/preview-deployment-runbook.md.                                                                                      
+  • Architecture mapping: Next.js on Vercel/Cloudflare Pages, NestJS API on Render Free Web Service, serverless PostgreSQL on Neon, and BullMQ on Upstash Redis.
+  • Synthetic seed instructions ensuring zero real patient data enters hobby preview environments.
+  
+  5. Phase 14 — Production Infrastructure & Disaster Recovery
+  
+  • Production reference architecture: docs/deployment/production-deployment.md.
+  • AWS Mumbai (ap-south-1) Multi-AZ configuration: Route 53, CloudFront + WAF, ALB, ECS Fargate tasks, Amazon RDS Multi-AZ PostgreSQL 17 with continuous PITR, ElastiCache Redis,
+  S3 with SSE-KMS, and zero-proprietary-lock-in vendor exit strategy.
+  ──────
+  Verification & Quality Gates Passed
+  
+  • Testing: All 27 integration tests across 8 test suites in apps/api passed cleanly.
+  • Code Quality: pnpm check passed without warnings or errors (Prettier formatting, ESLint, TypeScript compilation across monorepo packages, and Next.js static build).          
+  • Documentation Updated:
+      • README.md
+      • CLAUDE.md
+      • docs/architecture/roadmap.md
+      • prompt_responses.md
+  • Git: Committed and pushed to origin/main (e4bc7f5). 
+
+# Prompt 11
+
+  > check the entire project, if there are any issues, fix it. after all that, make a detailed md file that explains the entire project, including how to set it up, any values etc to setup, any other setups to be done, details on hosting(aws and vercel + railway, both), details including every feature, how to use it, how to each feature works etc. everything. everything that needs to be known about the project. while writing, make sure try it out, visually inspect if needed and any issues faced must be fixed along way.
+
+# Response 11
+
+Full System Audit, Verification, and Master Project Guide Delivery
+
+### 1. Project Verification & Audit Findings
+- **Infrastructure Status**: All 4 Docker containers (PostgreSQL 17, Redis 8, MinIO S3, Mailpit) running healthy.
+- **Service Health (`pnpm health`)**: Verified 6/6 services reporting 200 OK (`web`, `api`, `api via web proxy`, `worker`, `minio`, `mailpit`).
+- **Integration Test Suites**: All 27 integration tests across 8 test suites passing (`test/analytics.spec.ts`, `test/appointments.spec.ts`, `test/auth.spec.ts`, `test/automation.spec.ts`, `test/clinical.spec.ts`, `test/communication.spec.ts`, `test/health.spec.ts`, `test/marketing.spec.ts`).
+- **End-to-End & Visual Regression Suite**: 83/83 Playwright E2E and visual tests passed cleanly across desktop, tablet, and mobile viewports.
+- **Code Quality Gates (`pnpm check`)**: Prettier formatting, ESLint rules, TypeScript strict compilation, Turborepo pipeline, and Next.js static build verified with 0 errors.
+
+### 2. Comprehensive Master Guide Created
+Authored [`MASTER_PROJECT_GUIDE.md`](MASTER_PROJECT_GUIDE.md) covering:
+1. Executive Overview & Architecture diagrams.
+2. Complete monorepo anatomy and package responsibilities.
+3. Local development setup instructions.
+4. Comprehensive environment variable reference.
+5. In-depth walkthrough of every system feature:
+   - Public Website & SEO Engine
+   - Authentication, Sessions & RBAC
+   - Patient Management & Consent Tracking (DPDP Act)
+   - Appointment Scheduling & Multi-Chair Calendar
+   - Clinical Records, FDI Odontogram & Treatment Planning
+   - Unified Communication Inbox & Webhooks
+   - Automation Engine & Approval Graphs
+   - Marketing Operations & Clinical Approval
+   - Analytics, Funnels & CSV Exports
+6. Free Preview Staging deployment guide (Vercel + Railway / Render + Neon).
+7. Production AWS deployment architecture (ECS Fargate, RDS Multi-AZ, S3 SSE-KMS, Route 53 + WAF).
+8. Backup/Restore runbooks, operational maintenance, and troubleshooting FAQ.
