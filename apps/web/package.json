@@ -14,13 +14,13 @@
     "clean": "rm -rf .next .turbo"
   },
   "dependencies": {
-    "@hookform/resolvers": "7.0.6",
+    "@hookform/resolvers": "7.0.8",
     "@kmsdc/api-client": "workspace:*",
     "@kmsdc/config": "workspace:*",
     "@kmsdc/types": "workspace:*",
     "@kmsdc/ui": "workspace:*",
     "@kmsdc/validation": "workspace:*",
-    "lucide-react": "1.72.0",
+    "lucide-react": "1.78.0",
     "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
-    "@playwright/test": "1.65.0",
+    "@playwright/test": "1.65.1",
     "@tailwindcss/postcss": "4.3.5",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
@@ -38,6 +38,6 @@
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.5",
     "typescript": "6.0.3",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   }
 }
